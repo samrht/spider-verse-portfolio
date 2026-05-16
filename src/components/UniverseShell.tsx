@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { type Universe } from '../store/universeStore'
-import { requestUniverseChange } from '../engine/universeTransition'
 
 interface Props {
   universe: Universe
@@ -11,8 +10,11 @@ interface Props {
 
 // Section wrapper that injects the universe's CSS-token context and reports
 // itself to the universe store when it dominates the viewport. Layout is
-// owned by the section content, not by this shell. Universe changes route
-// through the glitch transition (Step 10).
+// owned by the section content, not by this shell.
+//
+// universeTransition is dynamic-imported so its Three.js + GSAP dependencies
+// don't bleed into the entry graph. The IO callback only ever fires after
+// the user scrolls, so paying for the import there is free.
 export function UniverseShell({ universe, id, children }: Props) {
   const ref = useRef<HTMLElement>(null)
 
@@ -20,11 +22,21 @@ export function UniverseShell({ universe, id, children }: Props) {
     const el = ref.current
     if (!el) return
 
+    // Cache the trigger so we don't re-hit the dynamic import on every
+    // intersection event after the first scroll.
+    let trigger: ((u: Universe) => void) | null = null
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.intersectionRatio >= 0.55) {
-            requestUniverseChange(universe)
+          if (entry.intersectionRatio < 0.55) continue
+          if (trigger) {
+            trigger(universe)
+          } else {
+            import('../engine/universeTransition').then((mod) => {
+              trigger = mod.requestUniverseChange
+              trigger(universe)
+            })
           }
         }
       },
