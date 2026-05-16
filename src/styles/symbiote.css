@@ -1,0 +1,32 @@
+/* Spider-Verse Portfolio — Symbiote / Venom Mode
+ * Toggled by SymbioteToggle.tsx via the `S → Y → M` easter-egg sequence.
+ * Token overrides live in tokens.css; this file owns the visual treatment. */
+
+[data-symbiote="true"] body {
+  background: var(--universe-bg);
+  color: var(--universe-text);
+}
+
+/* Black ink overlay injected by SymbioteToggle on activation.
+ * --ink-x / --ink-y are written from the cursor position at trigger time. */
+.symbiote-ink {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--ink-x, 50%) var(--ink-y, 50%),
+    #050505 0%,
+    #1a001f 55%,
+    transparent 100%
+  );
+  animation: ink-crawl 800ms cubic-bezier(0.87, 0, 0.13, 1) forwards;
+}
+
+/* Tendril decoration container — empty for Phase 1, populated by Phase 2. */
+[data-symbiote="true"] .symbiote-tendrils {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9990;
+}

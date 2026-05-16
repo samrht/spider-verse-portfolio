@@ -1,0 +1,145 @@
+/* Spider-Verse Portfolio — Section-level decor
+ * Visual flair per universe, scoped to each section's wrapper.
+ * Pointer-events: none so nothing here intercepts clicks. */
+
+.universe-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Earth-1610 · graffiti / halftone ------------------------------------ */
+.decor-earth-1610 {
+  background-image:
+    radial-gradient(circle at center, rgba(255, 45, 45, 0.16) 1px, transparent 1.5px),
+    radial-gradient(circle at center, rgba(123, 47, 255, 0.08) 1px, transparent 1.5px);
+  background-size: 28px 28px, 14px 14px;
+  background-position: 0 0, 7px 7px;
+  mix-blend-mode: screen;
+  opacity: 0.65;
+}
+
+/* Earth-65 · watercolor wash ----------------------------------------- */
+.decor-earth-65 {
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(110, 198, 245, 0.28), transparent 55%),
+    radial-gradient(ellipse at 85% 75%, rgba(245, 198, 208, 0.32), transparent 60%),
+    radial-gradient(ellipse at 50% 110%, rgba(110, 198, 245, 0.18), transparent 70%);
+  mix-blend-mode: multiply;
+}
+
+/* Earth-138 · punk grain + scanline noise --------------------------- */
+.decor-earth-138 {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(232, 212, 77, 0.06) 3px,
+      rgba(232, 212, 77, 0.06) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 8px,
+      rgba(192, 57, 43, 0.05) 8px,
+      rgba(192, 57, 43, 0.05) 9px
+    );
+}
+.decor-earth-138::before,
+.decor-earth-138::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 18px;
+  background: linear-gradient(to bottom, var(--universe-bg), transparent);
+  clip-path: polygon(
+    0 0, 4% 60%, 9% 30%, 14% 80%, 19% 20%, 24% 70%, 29% 35%, 34% 85%,
+    39% 25%, 44% 75%, 49% 30%, 54% 80%, 59% 25%, 64% 70%, 69% 35%, 74% 85%,
+    79% 20%, 84% 75%, 89% 30%, 94% 70%, 100% 40%, 100% 100%, 0 100%
+  );
+}
+.decor-earth-138::before { top: 0; transform: scaleY(-1); }
+.decor-earth-138::after  { bottom: 0; }
+
+/* Earth-928 · HUD grid + scan line ---------------------------------- */
+.decor-earth-928 {
+  background-image:
+    linear-gradient(to right, rgba(0, 212, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 212, 255, 0.07) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+.decor-earth-928::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(0, 212, 255, 0.6), transparent);
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.6);
+  animation: scan-line 6s linear infinite;
+  top: 0;
+}
+
+/* Universe content frame ------------------------------------------- */
+.universe-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(4rem, 10vh, 8rem) clamp(1.5rem, 5vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vh, 4rem);
+}
+
+/* Reserve the Bugle sidebar's width on tablet+ so copy never tucks under it.
+ * Padding on the section (not the inner box) keeps the universe background
+ * spanning the full viewport while the centered content sits clear of the
+ * sidebar. --bugle-w tracks the Bugle's expanded vs collapsed state
+ * (tokens.css :has() rule) and collapses to 0 below 768px. The eased
+ * padding transition rides the same curve as the Bugle's own width animation. */
+section[data-universe] {
+  padding-left: var(--bugle-w);
+  transition: padding-left 480ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.universe-hero {
+  text-align: center;
+}
+
+.universe-hero h2 {
+  font-size: var(--text-2xl);
+  color: var(--universe-primary);
+  text-shadow: var(--universe-glow);
+  margin: 0;
+}
+
+.universe-hero .tagline {
+  font-size: var(--text-lg);
+  margin: 0.5rem 0 0;
+  opacity: 0.9;
+}
+
+.universe-hero .meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-top: 0.75rem;
+  opacity: 0.5;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+@media (min-width: 640px) {
+  .projects-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .projects-grid { grid-template-columns: repeat(3, 1fr); }
+}

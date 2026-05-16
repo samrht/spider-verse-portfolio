@@ -1,0 +1,40 @@
+/* Spider-Verse Portfolio — Typography
+ * Three typefaces, three jobs:
+ *   Bangers          — display headings, universe titles, project names
+ *   Rajdhani         — body, UI labels, descriptions
+ *   Share Tech Mono  — HUD readouts, KAREN, 2099 vibe, code
+ *
+ * Imported from Google Fonts for now; swap to /public/fonts self-hosting before ship. */
+
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --font-display: 'Bangers', cursive;
+  --font-body: 'Rajdhani', system-ui, sans-serif;
+  --font-mono: 'Share Tech Mono', ui-monospace, Consolas, monospace;
+
+  /* Fluid type scale */
+  --text-xs:   clamp(0.7rem,   1vw,   0.8rem);
+  --text-sm:   clamp(0.875rem, 1.2vw, 1rem);
+  --text-base: clamp(1rem,     1.5vw, 1.125rem);
+  --text-lg:   clamp(1.125rem, 2vw,   1.5rem);
+  --text-xl:   clamp(1.5rem,   3vw,   2rem);
+  --text-2xl:  clamp(2rem,     4vw,   3rem);
+  --text-hero: clamp(3rem,     8vw,   7rem);
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+code, kbd, samp, pre, .mono {
+  font-family: var(--font-mono);
+}

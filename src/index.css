@@ -1,0 +1,36 @@
+@import './styles/tokens.css';
+@import './styles/typography.css';
+@import './styles/animations.css';
+@import './styles/sections.css';
+@import './styles/bugle.css';
+@import './styles/karen.css';
+@import './styles/locked.css';
+@import './styles/symbiote.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--universe-bg);
+  color: var(--universe-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 600ms ease, color 600ms ease;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

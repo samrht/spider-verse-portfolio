@@ -1,0 +1,67 @@
+/* Spider-Verse Portfolio — Shared Animations
+ * Keyframes used across components. Component-specific motion stays local.
+ * GSAP is the primary animation primitive; CSS lives here for simple state. */
+
+@keyframes spider-pulse {
+  0%   { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes glitch-flicker {
+  0%, 100% { transform: translateX(0);   opacity: 1; }
+  20%      { transform: translateX(-2px); opacity: 0.85; }
+  40%      { transform: translateX(2px);  opacity: 1; }
+  60%      { transform: translateX(-1px); opacity: 0.9; }
+  80%      { transform: translateX(1px);  opacity: 1; }
+}
+
+@keyframes ink-crawl {
+  from { clip-path: circle(0%  at var(--ink-x, 50%) var(--ink-y, 50%)); }
+  to   { clip-path: circle(150% at var(--ink-x, 50%) var(--ink-y, 50%)); }
+}
+
+@keyframes paper-unfold {
+  from { transform: scaleY(0); transform-origin: top; }
+  to   { transform: scaleY(1); transform-origin: top; }
+}
+
+@keyframes scan-line {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(100vh); }
+}
+
+/* Reduced-motion: kill every CSS animation/transition/smooth-scroll.
+ * GSAP- and JS-driven motion is gated in src/engine/motion.ts and Home.tsx. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* High-contrast / glitch effects that don't read as "motion" but still
+   * trigger vestibular issues: kill the chromatic split, the scanlines, and
+   * the KAREN flicker / portal glitch animations explicitly. */
+  .karen-hud,
+  .karen-status,
+  .locked-title,
+  .portal-card:hover {
+    animation: none !important;
+  }
+
+  .karen-hud { filter: none !important; }
+  .locked-title::before,
+  .locked-title::after { display: none !important; }
+
+  /* Earth-928's scanline sweep — disable. */
+  .decor-earth-928::after { display: none !important; }
+
+  /* The cursor still functions in reduced-motion (engine drops the elastic
+   * lag), but kill its hover-grow transition. */
+  #spider-cursor { transition: none !important; }
+}

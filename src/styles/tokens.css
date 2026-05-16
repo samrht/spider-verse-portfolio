@@ -1,0 +1,78 @@
+/* Spider-Verse Portfolio — Design Tokens
+ * One palette per universe, scoped to [data-universe="..."] on <html>.
+ * Symbiote mode overrides via [data-symbiote="true"] regardless of universe. */
+
+/* Layout constants shared across the fixed sidebar and the section padding.
+ * The Bugle lives on the LEFT edge; --bugle-w is the live width so sections
+ * stay clear of it. When the Bugle is collapsed (user clicked the masthead),
+ * the variable drops to the tab width and the sections re-center via their
+ * own padding transition. */
+:root {
+  --bugle-w-expanded: max(20vw, 240px);
+  --bugle-w-collapsed: 36px;
+  --bugle-w: var(--bugle-w-expanded);
+}
+:root:has(.daily-bugle[data-collapsed]) {
+  --bugle-w: var(--bugle-w-collapsed);
+}
+@media (max-width: 767px) {
+  :root,
+  :root:has(.daily-bugle[data-collapsed]) {
+    --bugle-w: 0px;
+  }
+}
+
+/* Base / default — Earth-1610 (Miles Morales) */
+:root,
+[data-universe="earth-1610"] {
+  --universe-bg: #0a0015;
+  --universe-primary: #ff2d2d;
+  --universe-accent: #7b2fff;
+  --universe-text: #f0e6ff;
+  --universe-surface: rgba(123, 47, 255, 0.08);
+  --universe-glow: 0 0 40px rgba(255, 45, 45, 0.4);
+  --universe-vibe: "graffiti";
+}
+
+/* Earth-65 (Gwen Stacy) */
+[data-universe="earth-65"] {
+  --universe-bg: #f5f0f8;
+  --universe-primary: #6ec6f5;
+  --universe-accent: #f5c6d0;
+  --universe-text: #2d1f3d;
+  --universe-surface: rgba(110, 198, 245, 0.12);
+  --universe-glow: 0 0 30px rgba(110, 198, 245, 0.3);
+  --universe-vibe: "watercolor";
+}
+
+/* Earth-138 (Spider-Punk) */
+[data-universe="earth-138"] {
+  --universe-bg: #1a1400;
+  --universe-primary: #e8d44d;
+  --universe-accent: #c0392b;
+  --universe-text: #f5f0d0;
+  --universe-surface: rgba(232, 212, 77, 0.08);
+  --universe-glow: 0 0 20px rgba(232, 212, 77, 0.5);
+  --universe-vibe: "punk";
+}
+
+/* Earth-928 (Spider-Man 2099) */
+[data-universe="earth-928"] {
+  --universe-bg: #020b18;
+  --universe-primary: #00d4ff;
+  --universe-accent: #0057ff;
+  --universe-text: #c0f0ff;
+  --universe-surface: rgba(0, 212, 255, 0.06);
+  --universe-glow: 0 0 60px rgba(0, 212, 255, 0.2);
+  --universe-vibe: "hud";
+}
+
+/* Symbiote / Venom mode — overrides all universes */
+[data-symbiote="true"] {
+  --universe-bg: #050505;
+  --universe-primary: #8b00ff;
+  --universe-accent: #ffffff;
+  --universe-text: #e8e8e8;
+  --universe-surface: rgba(139, 0, 255, 0.08);
+  --universe-glow: 0 0 50px rgba(139, 0, 255, 0.6);
+}
