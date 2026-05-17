@@ -16,6 +16,10 @@ dist-ssr
 .claude/
 .vercel/
 
+# Throwaway scratch dir used to host one-off Node deps (e.g. SVG → PNG conversion
+# via @resvg/resvg-js). Safe to delete; recreated on demand.
+.ogtmp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

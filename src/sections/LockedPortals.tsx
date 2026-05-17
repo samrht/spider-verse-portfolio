@@ -39,7 +39,7 @@ export function LockedPortals() {
                 className="portal-card"
                 data-phase={p.phase}
                 data-spider-sense
-                aria-label={`${p.label} — locked, Phase ${p.phase} clearance required`}
+                aria-label={`${p.label} PHASE ${p.phase} — locked, clearance required`}
               >
                 <span className="portal-lock" aria-hidden="true">⌬</span>
                 <span className="portal-label">{p.label}</span>

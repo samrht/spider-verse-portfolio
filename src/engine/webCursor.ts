@@ -122,12 +122,26 @@ function injectBaseStyles() {
       will-change: transform;
       transition: width 180ms ease, height 180ms ease, margin 180ms ease;
     }
+    /* Earth-65 (Gwen) is a light watercolour palette — mix-blend-mode: difference
+       reads as a muddy teal blob on it. Drop the blend mode on that universe so
+       the cursor renders as its solid pink primary, with a darker ink halo. */
+    [data-universe="earth-65"] #${CURSOR_ID} {
+      mix-blend-mode: normal;
+      background: var(--universe-primary, #6ec6f5);
+      box-shadow:
+        0 0 0 1.5px rgba(45, 31, 61, 0.55),
+        0 0 14px var(--universe-primary, #6ec6f5);
+    }
     #${CURSOR_ID}.is-hover {
       width: 26px;
       height: 26px;
       margin: -13px 0 0 -13px;
       background: transparent;
       border: 2px solid var(--universe-primary, #ff2d2d);
+    }
+    [data-universe="earth-65"] #${CURSOR_ID}.is-hover {
+      border-color: var(--universe-text, #2d1f3d);
+      box-shadow: 0 0 12px var(--universe-primary, #6ec6f5);
     }
     #${CURSOR_ID}.is-pressed {
       transform: scale(0.6);

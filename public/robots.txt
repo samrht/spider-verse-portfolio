@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://spider-verse-portfolio-ochre.vercel.app/sitemap.xml

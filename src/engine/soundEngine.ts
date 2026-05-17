@@ -12,19 +12,21 @@ interface TrackDef {
   html5?: boolean
 }
 
+// Each track lists both .ogg and .mp3 so users can drop in either format
+// (or both) and Howler picks the first one that decodes.
 const AMBIENT: Record<Universe, TrackDef> = {
-  'earth-1610': { src: ['/audio/ambient-1610.ogg'], volume: 0.28, loop: true, html5: true },
-  'earth-65':   { src: ['/audio/ambient-65.ogg'],   volume: 0.28, loop: true, html5: true },
-  'earth-138':  { src: ['/audio/ambient-138.ogg'],  volume: 0.32, loop: true, html5: true },
-  'earth-928':  { src: ['/audio/ambient-928.ogg'],  volume: 0.25, loop: true, html5: true },
+  'earth-1610': { src: ['/audio/ambient-1610.ogg', '/audio/ambient-1610.mp3'], volume: 0.28, loop: true, html5: true },
+  'earth-65':   { src: ['/audio/ambient-65.ogg',   '/audio/ambient-65.mp3'],   volume: 0.28, loop: true, html5: true },
+  'earth-138':  { src: ['/audio/ambient-138.ogg',  '/audio/ambient-138.mp3'],  volume: 0.32, loop: true, html5: true },
+  'earth-928':  { src: ['/audio/ambient-928.ogg',  '/audio/ambient-928.mp3'],  volume: 0.25, loop: true, html5: true },
 }
 
 const FX: Record<string, TrackDef> = {
-  hover:    { src: ['/audio/fx-hover.ogg'],    volume: 0.18 },
-  click:    { src: ['/audio/fx-click.ogg'],    volume: 0.30 },
-  webshot:  { src: ['/audio/fx-webshot.ogg'],  volume: 0.45 },
-  glitch:   { src: ['/audio/fx-glitch.ogg'],   volume: 0.40 },
-  symbiote: { src: ['/audio/fx-symbiote.ogg'], volume: 0.55 },
+  hover:    { src: ['/audio/fx-hover.ogg',    '/audio/fx-hover.mp3'],    volume: 0.18 },
+  click:    { src: ['/audio/fx-click.ogg',    '/audio/fx-click.mp3'],    volume: 0.30 },
+  webshot:  { src: ['/audio/fx-webshot.ogg',  '/audio/fx-webshot.mp3'],  volume: 0.45 },
+  glitch:   { src: ['/audio/fx-glitch.ogg',   '/audio/fx-glitch.mp3'],   volume: 0.40 },
+  symbiote: { src: ['/audio/fx-symbiote.ogg', '/audio/fx-symbiote.mp3'], volume: 0.55 },
 }
 
 const ambientHowls = new Map<Universe, Howl>()
