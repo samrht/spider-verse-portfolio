@@ -16,6 +16,12 @@ const KarenHUD = lazy(() =>
 const SymbioteToggle = lazy(() =>
   import('../components/SymbioteToggle').then((m) => ({ default: m.SymbioteToggle })),
 )
+// Bugle full-edition overlay. Mounted always (renders null while closed) so
+// the GSAP unfold timeline isn't gated behind a second Suspense roundtrip
+// when the user clicks "FULL EDITION →".
+const BugleOverlay = lazy(() =>
+  import('../components/BugleOverlay').then((m) => ({ default: m.BugleOverlay })),
+)
 
 // Home orchestrates the mothership: 2.5s halftone loader, then the four
 // universe sections + locked portal gateway, with the cursor/spider-sense
@@ -133,6 +139,7 @@ export function Home() {
           <DailyBugle />
           <KarenHUD />
           <SymbioteToggle />
+          <BugleOverlay />
         </Suspense>
       )}
       <main>

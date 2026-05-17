@@ -9,6 +9,10 @@ import { Home } from './pages/Home'
 const LockedPage = lazy(() =>
   import('./pages/LockedPage').then((m) => ({ default: m.LockedPage })),
 )
+// Phase 2: /bugle is now a real broadsheet page (not a locked stub).
+const Bugle = lazy(() =>
+  import('./pages/Bugle').then((m) => ({ default: m.Bugle })),
+)
 
 const locked = (phase: 2 | 3, concept: string) => (
   <Suspense fallback={<div style={{ position: 'fixed', inset: 0, background: '#04000a' }} />}>
@@ -16,12 +20,18 @@ const locked = (phase: 2 | 3, concept: string) => (
   </Suspense>
 )
 
+const bugleRoute = (
+  <Suspense fallback={<div style={{ position: 'fixed', inset: 0, background: '#0a0015' }} />}>
+    <Bugle />
+  </Suspense>
+)
+
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
 
-  // Phase 2 — locked
+  // Phase 2
   { path: '/suit',  element: locked(2, 'Spider-Suit HUD') },
-  { path: '/bugle', element: locked(2, 'Daily Bugle') },
+  { path: '/bugle', element: bugleRoute },
   { path: '/story', element: locked(2, 'The Story') },
 
   // Phase 3 — locked
