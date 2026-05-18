@@ -128,24 +128,37 @@
   border-top: 1px solid var(--universe-surface);
   border-bottom: 1px solid var(--universe-surface);
   padding: 0.4rem 0;
-  overflow-x: auto;
-  scrollbar-width: none;
 }
-.bugle-tabs::-webkit-scrollbar { display: none; }
+/* Sidebar variant: 5 tabs don't fit horizontally in a ~240px rail. Wrap
+ * onto multiple rows so every tab is clickable. (Earlier version used
+ * overflow-x: auto with hidden scrollbars — looked clean but Science +
+ * Entertainment overflowed past the sidebar's right edge with no way to
+ * reach them.) */
+.bugle-tabs[data-variant="sidebar"] {
+  flex-wrap: wrap;
+  overflow: visible;
+  gap: 0.3rem 0.25rem;
+  justify-content: center;
+}
+/* Wide variant (overlay + page): horizontal scroll is fine because the
+ * container is at least viewport-wide. */
 .bugle-tabs[data-variant="wide"] {
   gap: 0.4rem;
   padding: 0.6rem 0;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+.bugle-tabs[data-variant="wide"]::-webkit-scrollbar { display: none; }
 .bugle-tab-btn {
   appearance: none;
   background: transparent;
   border: 1px solid transparent;
   color: var(--universe-text);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  padding: 0.3rem 0.55rem;
+  padding: 0.32rem 0.5rem;
   cursor: pointer;
   opacity: 0.55;
   transition: opacity 160ms ease, color 160ms ease,
@@ -174,6 +187,11 @@
   min-height: 0;
   overflow-y: auto;
   padding-right: 0.25rem;
+  /* Keep wheel scroll contained — without this, reaching the top/bottom of
+   * the inner list bubbles the scroll up to the document. The matching
+   * data-lenis-prevent attribute on the React element tells Lenis to skip
+   * smooth-scroll handling for this subtree so the native scroll works. */
+  overscroll-behavior: contain;
 }
 .bugle-feed-list {
   list-style: none;

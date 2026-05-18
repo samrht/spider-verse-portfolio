@@ -146,7 +146,7 @@ export function DailyBugle() {
 
         <BugleCategoryTabs variant="sidebar" />
 
-        <section className="bugle-feed" aria-live="polite">
+        <section className="bugle-feed" aria-live="polite" data-lenis-prevent>
           {isLoading ? (
             <StopThePresses variant="compact" />
           ) : articles.length === 0 ? (
