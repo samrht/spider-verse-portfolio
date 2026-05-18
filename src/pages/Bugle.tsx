@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { fetchBugleNews, BugleApiError } from '../api/newsApi'
 import { useBugleStore } from '../store/bugleStore'
 import { BugleCategoryTabs } from '../components/BugleCategoryTabs'
@@ -233,6 +233,9 @@ export function Bugle() {
       </header>
 
       <div className="bugle-page-tabs">
+        <Link to="/" className="bugle-back-link" aria-label="Return to the mothership portfolio">
+          ← MOTHERSHIP
+        </Link>
         <BugleCategoryTabs variant="wide" />
       </div>
 
