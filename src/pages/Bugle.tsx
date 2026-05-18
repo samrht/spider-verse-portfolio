@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { fetchBugleNews, BugleApiError } from '../api/newsApi'
 import { useBugleStore } from '../store/bugleStore'
@@ -136,14 +136,91 @@ export function Bugle() {
     }
   }, [])
 
-  // Smooth-scroll to the active section when a tab is clicked.
+  // Scroll-spy needs a brief mute window every time the category changes via
+  // a tab click — the smooth-scroll animation passes intermediate sections
+  // through the IO trigger band, which would otherwise feed back into
+  // setCategory and prevent the scroll from reaching its target. We also
+  // mute for 2s on initial mount so the URL-hydrated category (if any) isn't
+  // immediately overwritten by whatever's visible at scroll=0.
+  const scrollSpyMuteUntilRef = useRef<number>(
+    typeof performance !== 'undefined' ? performance.now() + 2000 : 0,
+  )
+  const selectedCategoryRef = useRef(selectedCategory)
+  useEffect(() => {
+    selectedCategoryRef.current = selectedCategory
+  }, [selectedCategory])
+
+  // Smooth-scroll to the active section when the category changes. Two
+  // skip paths so this only fires on user-driven tab clicks, not on
+  // scroll-spy updates:
+  //   1. window.scrollY < 10 — initial load / deep link, keep the user on
+  //      the masthead instead of snapping past it.
+  //   2. The target section is already in the active band — the scroll-spy
+  //      just set this category because the user scrolled here. Snapping
+  //      to the section top would feel jerky / steal scroll control.
   useEffect(() => {
     const target = document.getElementById(`bugle-section-${selectedCategory}`)
     if (!target) return
-    // Skip the initial paint scroll so deep links don't bypass the masthead.
     if (typeof window !== 'undefined' && window.scrollY < 10) return
+
+    const rect = target.getBoundingClientRect()
+    const triggerY = window.innerHeight * 0.25
+    const inActiveBand = rect.top <= triggerY && rect.top + rect.height > triggerY
+    if (inActiveBand) return
+
+    scrollSpyMuteUntilRef.current = performance.now() + 900
     target.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [selectedCategory])
+
+  // Scroll-spy: as the user scrolls naturally, light up the tab for the
+  // section whose top has most-recently passed the trigger line (25% from
+  // viewport top). We use a manual scroll listener rather than
+  // IntersectionObserver because each section is ~4000px tall — IO with a
+  // narrow trigger band leaves all 5 sections with tiny intersection ratios
+  // (~0.04), and "highest ratio wins" stops being a meaningful signal at
+  // that scale. Manual scroll lets us pick the last section that has crossed
+  // the trigger line in DOM order — which is exactly the section the user
+  // is currently reading.
+  useEffect(() => {
+    let rafPending = false
+
+    const tick = () => {
+      rafPending = false
+      if (performance.now() < scrollSpyMuteUntilRef.current) return
+      const triggerY = window.innerHeight * 0.25
+      let active: BugleCategory | null = null
+      for (const cat of BUGLE_CATEGORIES) {
+        const el = document.getElementById(`bugle-section-${cat}`)
+        if (!el) continue
+        const top = el.getBoundingClientRect().top
+        if (top <= triggerY) {
+          active = cat
+        } else {
+          // Sections render in DOM order = visual top-to-bottom. Once a
+          // section hasn't crossed the line, none below it have either.
+          break
+        }
+      }
+      if (active && active !== selectedCategoryRef.current) {
+        setCategory(active)
+      }
+    }
+
+    const onScroll = () => {
+      if (rafPending) return
+      rafPending = true
+      requestAnimationFrame(tick)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    // Run once on mount so we settle on the right tab if the user lands
+    // already scrolled (e.g., browser restored scroll position).
+    onScroll()
+
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [setCategory])
 
   return (
     <main className="bugle-page bugle-surface" data-universe="earth-1610">
