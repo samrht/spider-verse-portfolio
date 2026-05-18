@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react'
+import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { fetchBugleNews, BugleApiError } from '../api/newsApi'
 import { useBugleStore } from '../store/bugleStore'
@@ -173,6 +174,13 @@ export function DailyBugle() {
           >
             FULL EDITION →
           </button>
+          <Link
+            to="/bugle"
+            className="bugle-open-page bugle-open-page--sidebar"
+            onClick={(e) => e.stopPropagation()}
+          >
+            OPEN DEDICATED PAGE ↗
+          </Link>
           <span className="bugle-footer-meta">EST. 1962 · J.J.J., ED.</span>
         </footer>
       </div>

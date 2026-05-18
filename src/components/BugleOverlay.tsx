@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { useBugleStore } from '../store/bugleStore'
 import { fetchBugleNews, BugleApiError } from '../api/newsApi'
@@ -154,15 +155,25 @@ export function BugleOverlay() {
       <div ref={surfaceRef} className="bugle-overlay bugle-surface">
         <header className="bugle-overlay-header">
           <h2 className="bugle-overlay-masthead">THE DAILY BUGLE</h2>
-          <button
-            ref={closeBtnRef}
-            type="button"
-            className="bugle-close"
-            onClick={closeOverlay}
-            aria-label="Close the full edition"
-          >
-            ✕ CLOSE EDITION
-          </button>
+          <div className="bugle-overlay-actions">
+            <Link
+              to="/bugle"
+              className="bugle-open-page"
+              onClick={closeOverlay}
+              aria-label="Open the full Daily Bugle page"
+            >
+              OPEN PAGE ↗
+            </Link>
+            <button
+              ref={closeBtnRef}
+              type="button"
+              className="bugle-close"
+              onClick={closeOverlay}
+              aria-label="Close the full edition"
+            >
+              ✕ CLOSE EDITION
+            </button>
+          </div>
         </header>
         <div className="bugle-overlay-tabs">
           <BugleCategoryTabs variant="wide" />

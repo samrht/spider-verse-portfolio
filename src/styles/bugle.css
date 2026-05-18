@@ -357,6 +357,38 @@
   padding: 1.1rem 1.5rem 0.6rem;
   border-bottom: 1px solid var(--universe-surface);
 }
+.bugle-overlay-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.bugle-open-page {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--universe-text);
+  opacity: 0.6;
+  text-decoration: none;
+  padding: 0.5rem 0.7rem;
+  border: 1px dashed var(--universe-surface);
+  transition: opacity 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.bugle-open-page:hover,
+.bugle-open-page:focus-visible {
+  opacity: 1;
+  color: var(--universe-primary);
+  border-color: var(--universe-primary);
+  outline: none;
+}
+/* Sidebar variant — full-width text link under the FULL EDITION button. */
+.bugle-open-page--sidebar {
+  display: block;
+  text-align: center;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  padding: 0.4rem 0.5rem;
+}
 .bugle-overlay-masthead {
   margin: 0;
   font-family: var(--font-display);
@@ -395,12 +427,21 @@
   padding: 1.5rem;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: minmax(180px, auto);
+  /* No grid-auto-rows here — the row track must size to its tallest cell.
+   * Previously had `minmax(180px, auto)` which fights with the spider card's
+   * `height: 100%` + `grid-row: 1/span 2` (cyclic sizing → row collapses to
+   * the 180px min, taller cards overflow into the next row). */
   gap: 1.25rem;
+  align-content: start;
   /* Contain wheel scroll inside the overlay so it doesn't leak to the
    * page underneath. Belt-and-suspenders with the data-lenis-prevent
    * attribute on the backdrop. */
   overscroll-behavior: contain;
+}
+.bugle-overlay-body > .bugle-card {
+  /* Don't let auto-placed cards stretch — each sizes to its own content
+   * and the row track follows the tallest. */
+  align-self: start;
 }
 .bugle-overlay-spider {
   grid-column: 1;
