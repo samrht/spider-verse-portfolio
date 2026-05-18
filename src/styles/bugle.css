@@ -397,6 +397,10 @@
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: minmax(180px, auto);
   gap: 1.25rem;
+  /* Contain wheel scroll inside the overlay so it doesn't leak to the
+   * page underneath. Belt-and-suspenders with the data-lenis-prevent
+   * attribute on the backdrop. */
+  overscroll-behavior: contain;
 }
 .bugle-overlay-spider {
   grid-column: 1;

@@ -143,6 +143,7 @@ export function BugleOverlay() {
       ref={backdropRef}
       className="bugle-overlay-backdrop"
       data-universe="earth-1610"
+      data-lenis-prevent
       onClick={(e) => {
         if (e.target === e.currentTarget) closeOverlay()
       }}
