@@ -4,6 +4,7 @@ import { Earth65 } from '../sections/Earth65'
 import { Earth138 } from '../sections/Earth138'
 import { Earth928 } from '../sections/Earth928'
 import { LockedPortals } from '../sections/LockedPortals'
+import { useSuitStore } from '../store/suitStore'
 
 // Post-loader UI is lazy so GSAP (DailyBugle) and Howler (audioStore chain
 // behind SymbioteToggle) stay off the initial critical path.
@@ -22,6 +23,12 @@ const SymbioteToggle = lazy(() =>
 const BugleOverlay = lazy(() =>
   import('../components/BugleOverlay').then((m) => ({ default: m.BugleOverlay })),
 )
+// Spider-Suit HUD overlay — same mount strategy as BugleOverlay. Renders
+// null while closed so its GSAP open tween isn't gated behind a second
+// Suspense round-trip when the user clicks "INITIALIZE SUIT SYSTEMS".
+const SuitHUD = lazy(() =>
+  import('../components/SuitHUD/SuitHUD').then((m) => ({ default: m.SuitHUD })),
+)
 
 // Home orchestrates the mothership: 2.5s halftone loader, then the four
 // universe sections + locked portal gateway, with the cursor/spider-sense
@@ -30,6 +37,31 @@ const BugleOverlay = lazy(() =>
 //
 // Engines that depend on Three.js, GSAP, Lenis, Howler are loaded via
 // dynamic import() so their bytes don't sit on the critical path.
+// Mothership-level "summon the Suit HUD" panel. Lives between Earth-928 and
+// the locked portals so it reads as the natural payoff of the 2099 section.
+// data-universe="earth-928" inherits the HUD's home palette without coupling
+// to whatever universe the visitor is currently snap-scrolled to.
+function SuitStandby() {
+  const openSuit = useSuitStore((s) => s.openSuit)
+  return (
+    <section className="suit-standby" data-universe="earth-928" aria-label="Spider-Suit HUD launchpad">
+      <div className="suit-standby-emblem" aria-hidden="true">
+        <span className="suit-standby-ring" />
+        <span className="suit-standby-ring" />
+        <span className="suit-standby-ring" />
+        <svg viewBox="0 0 24 24" width="56" height="56" fill="currentColor">
+          <path d="M12 3 L13.6 8 L18 6.2 L15.6 10.4 L20 11.5 L15.6 13.6 L18 17.8 L13.6 16 L12 21 L10.4 16 L6 17.8 L8.4 13.6 L4 11.5 L8.4 10.4 L6 6.2 L10.4 8 Z" />
+          <circle cx="12" cy="11.5" r="1.8" />
+        </svg>
+      </div>
+      <span className="suit-standby-label">SUIT SYSTEMS STANDING BY</span>
+      <button type="button" className="suit-standby-btn" onClick={() => void openSuit()} data-spider-sense>
+        [ ACTIVATE ]
+      </button>
+    </section>
+  )
+}
+
 export function Home() {
   // Dev hatch: ?nointro skips the loader when iterating in preview.
   const skipIntro =
@@ -140,6 +172,7 @@ export function Home() {
           <KarenHUD />
           <SymbioteToggle />
           <BugleOverlay />
+          <SuitHUD />
         </Suspense>
       )}
       <main>
@@ -147,6 +180,7 @@ export function Home() {
         <Earth65 />
         <Earth138 />
         <Earth928 />
+        <SuitStandby />
         <LockedPortals />
       </main>
     </>

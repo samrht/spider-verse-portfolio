@@ -13,6 +13,10 @@ const LockedPage = lazy(() =>
 const Bugle = lazy(() =>
   import('./pages/Bugle').then((m) => ({ default: m.Bugle })),
 )
+// Phase 2: /suit is now the live Spider-Suit HUD dashboard.
+const Suit = lazy(() =>
+  import('./pages/Suit').then((m) => ({ default: m.Suit })),
+)
 
 const locked = (phase: 2 | 3, concept: string) => (
   <Suspense fallback={<div style={{ position: 'fixed', inset: 0, background: '#04000a' }} />}>
@@ -26,11 +30,19 @@ const bugleRoute = (
   </Suspense>
 )
 
+// Suspense bg matches --universe-bg for the default suit mode (earth-928) so
+// the fallback doesn't flash a different colour before the page paints.
+const suitRoute = (
+  <Suspense fallback={<div style={{ position: 'fixed', inset: 0, background: '#020b18' }} />}>
+    <Suit />
+  </Suspense>
+)
+
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
 
   // Phase 2
-  { path: '/suit',  element: locked(2, 'Spider-Suit HUD') },
+  { path: '/suit',  element: suitRoute },
   { path: '/bugle', element: bugleRoute },
   { path: '/story', element: locked(2, 'The Story') },
 

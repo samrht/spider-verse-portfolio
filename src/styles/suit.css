@@ -1,0 +1,725 @@
+/* Spider-Suit HUD — Phase 2
+ * All colour is sourced from the active --universe-* cascade. The HUD root
+ * carries BOTH a `data-universe="earth-XXX"` attribute (drives all token
+ * inheritance) AND a `.suit-earthXXXX` class (used for HUD-only selectors
+ * like radar blip tint). No new universe palettes — zero duplication. */
+
+/* ============================================================
+   Backdrop + surface
+   ============================================================ */
+.suit-hud-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 210; /* one above BugleOverlay's 200 so the suit wins if both open */
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.85);
+  padding: clamp(1rem, 3vw, 2.5rem);
+  perspective: 1200px;
+}
+
+.suit-hud {
+  position: relative;
+  width: min(1180px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  background: var(--universe-bg);
+  color: var(--universe-text);
+  border: 1px solid var(--universe-primary);
+  box-shadow: var(--universe-glow);
+  font-family: var(--font-body);
+  isolation: isolate;
+}
+
+/* CRT scan-line overlay — sits above the surface but below the panels. */
+.suit-hud-scanline {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 50%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  background-size: 100% 4px;
+  opacity: 0.18;
+  z-index: 1;
+  mix-blend-mode: overlay;
+  animation: suit-scan-drift 8s linear infinite;
+}
+
+@keyframes suit-scan-drift {
+  from { background-position: 0 0; }
+  to   { background-position: 0 100px; }
+}
+
+/* ============================================================
+   Header + footer
+   ============================================================ */
+.suit-hud-header,
+.suit-hud-footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--universe-primary);
+  margin-bottom: 1rem;
+}
+.suit-hud-footer {
+  padding-bottom: 0;
+  padding-top: 0.75rem;
+  border-bottom: none;
+  border-top: 1px solid var(--universe-primary);
+  margin-top: 1rem;
+  margin-bottom: 0;
+  flex-wrap: wrap;
+}
+
+.suit-hud-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--universe-primary);
+  letter-spacing: 0.05em;
+}
+
+.suit-hud-close,
+.suit-hud-expand {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  color: var(--universe-primary);
+  background: transparent;
+  border: 1px solid var(--universe-primary);
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 120ms ease, color 120ms ease;
+}
+.suit-hud-close:hover,
+.suit-hud-expand:hover {
+  background: var(--universe-primary);
+  color: var(--universe-bg);
+}
+
+/* ============================================================
+   Grid layout — 2x2 on desktop, single-column on mobile
+   ============================================================ */
+.suit-hud-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    'chron atmos'
+    'fluid mission';
+  gap: 1rem;
+}
+
+.suit-panel-chron   { grid-area: chron; }
+.suit-panel-atmos   { grid-area: atmos; }
+.suit-panel-fluid   { grid-area: fluid; }
+.suit-panel-mission { grid-area: mission; }
+
+@media (max-width: 767px) {
+  .suit-hud-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'chron' 'atmos' 'fluid' 'mission';
+  }
+}
+
+/* ============================================================
+   Panel base
+   ============================================================ */
+.suit-panel {
+  position: relative;
+  padding: 0.9rem 1.1rem 1.1rem;
+  border: 1px solid var(--universe-primary);
+  background: var(--universe-surface);
+  backdrop-filter: blur(2px);
+  animation: suit-panel-flicker 0.55s ease-out both;
+}
+
+.suit-panel-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.22em;
+  color: var(--universe-primary);
+  opacity: 0.7;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+}
+
+@keyframes suit-panel-flicker {
+  0%   { opacity: 0;   transform: translateY(4px); }
+  18%  { opacity: 0.4; transform: translateY(0); }
+  22%  { opacity: 0.1; }
+  40%  { opacity: 0.9; }
+  46%  { opacity: 0.5; }
+  100% { opacity: 1;   transform: translateY(0); }
+}
+
+/* ============================================================
+   ChronPanel
+   ============================================================ */
+.suit-clock {
+  font-family: var(--font-mono);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--universe-primary);
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.suit-mission-day {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  opacity: 0.85;
+  margin-top: 0.45rem;
+  letter-spacing: 0.06em;
+}
+
+.suit-threat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.9rem;
+}
+
+.suit-threat-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  opacity: 0.7;
+}
+
+.suit-threat-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.18em;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid currentColor;
+  animation: suit-threat-pulse 2s ease-in-out infinite;
+  /* animationDuration is overridden inline per ThreatLevel from
+     THREAT_PULSE_DURATION_MS — LOW=3s, ELEVATED=2s, HIGH=1s, CRITICAL=0.4s. */
+}
+
+@keyframes suit-threat-pulse {
+  0%, 100% { opacity: 1;   box-shadow: 0 0 0 0 currentColor; }
+  50%      { opacity: 0.4; box-shadow: 0 0 12px 0 currentColor; }
+}
+
+.suit-stale-chip {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.15rem 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: #ff6a00;
+  border: 1px dashed #ff6a00;
+}
+
+/* ============================================================
+   AtmosPanel
+   ============================================================ */
+.suit-atmos-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--universe-primary);
+}
+
+.suit-atmos-icon { flex: none; }
+
+.suit-atmos-readout { line-height: 1.1; }
+
+.suit-atmos-temp {
+  font-family: var(--font-mono);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  letter-spacing: 0.04em;
+  color: var(--universe-primary);
+}
+
+.suit-atmos-city {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  color: var(--universe-text);
+}
+
+.suit-atmos-condition {
+  margin-top: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.12em;
+  color: var(--universe-text);
+  opacity: 0.9;
+}
+
+/* ============================================================
+   WebFluidPanel
+   ============================================================ */
+.suit-fluid-track {
+  width: 100%;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--universe-primary);
+  overflow: hidden;
+  position: relative;
+}
+
+.suit-fluid-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--universe-primary);
+  box-shadow: 0 0 16px var(--universe-primary);
+}
+
+.suit-fluid-readout {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  opacity: 0.85;
+}
+
+.suit-fluid-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin: 1rem 0 0;
+}
+.suit-fluid-grid > div { margin: 0; }
+.suit-fluid-grid dt {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  opacity: 0.6;
+  margin-bottom: 0.15rem;
+}
+.suit-fluid-grid dd {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--universe-primary);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.suit-active-threats {
+  color: #ff3b3b !important;
+  animation: suit-threat-pulse 0.6s ease-in-out infinite;
+}
+
+/* ============================================================
+   MissionPanel
+   ============================================================ */
+.suit-mission-codename {
+  font-size: var(--text-lg);
+  color: var(--universe-primary);
+  letter-spacing: 0.06em;
+  margin-bottom: 0.35rem;
+}
+
+.suit-mission-desc {
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  opacity: 0.9;
+  margin: 0 0 0.7rem;
+}
+
+.suit-mission-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suit-mission-status {
+  margin-top: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid currentColor;
+}
+.suit-status-active     { color: var(--universe-primary); }
+.suit-status-complete   { color: var(--universe-accent); opacity: 0.85; }
+.suit-status-classified { color: #ff6a00; }
+
+.suit-aug-label { margin-top: 1.1rem; }
+
+.suit-augmentations {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+}
+.suit-augmentations li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding: 0.2rem 0;
+}
+.suit-aug-arrow { color: var(--universe-primary); }
+.suit-aug-name { color: var(--universe-text); }
+.suit-aug-dots {
+  flex: 1;
+  border-bottom: 1px dotted currentColor;
+  opacity: 0.4;
+  transform: translateY(-0.25em);
+  margin: 0 0.25rem;
+}
+.suit-aug-status { color: var(--universe-primary); }
+
+/* ============================================================
+   SuitModeBar
+   ============================================================ */
+.suit-mode-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.suit-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--universe-primary) 50%, transparent);
+  color: var(--universe-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+}
+.suit-mode-btn:hover {
+  border-color: var(--universe-primary);
+  color: var(--universe-primary);
+}
+.suit-mode-btn.is-active {
+  border-color: var(--universe-primary);
+  color: var(--universe-primary);
+  background: color-mix(in srgb, var(--universe-primary) 12%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--universe-primary) 35%, transparent);
+}
+
+/* Per-mode emblem colours — each button always shows its own universe tint,
+   regardless of the currently active suit. Lets the row read as a colour
+   chooser at a glance. */
+.suit-mode-btn-earth1610 .suit-mode-emblem { color: #ff2d2d; }
+.suit-mode-btn-earth65   .suit-mode-emblem { color: #6ec6f5; }
+.suit-mode-btn-earth138  .suit-mode-emblem { color: #e8d44d; }
+.suit-mode-btn-earth928  .suit-mode-emblem { color: #00d4ff; }
+
+/* ============================================================
+   Boot sequence
+   ============================================================ */
+.suit-boot {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--universe-primary);
+  line-height: 1.5;
+  padding: 1.5rem 0.5rem;
+  margin: 0;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--universe-primary) 45%, transparent);
+  min-height: 18rem;
+}
+.suit-boot-line { white-space: pre; }
+.suit-boot-char { opacity: 0; }
+
+/* ============================================================
+   Earth-928 section "INITIALIZE SUIT SYSTEMS" panel
+   (Entry-point wiring — Step 6)
+   ============================================================ */
+.suit-os-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  background: var(--universe-surface);
+  border: 1px solid var(--universe-primary);
+  color: var(--universe-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.16em;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: var(--universe-glow);
+  transition: transform 160ms ease, background 160ms ease;
+}
+.suit-os-panel:hover {
+  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--universe-primary) 12%, transparent);
+}
+.suit-os-status { color: var(--universe-primary); }
+.suit-os-cta {
+  color: var(--universe-primary);
+  border: 1px solid var(--universe-primary);
+  padding: 0.35rem 0.75rem;
+}
+
+/* ============================================================
+   Home page "SUIT SYSTEMS STANDING BY / [ ACTIVATE ]" banner
+   ============================================================ */
+.suit-standby {
+  position: relative;
+  padding: clamp(3rem, 8vw, 6rem) 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  background: var(--universe-bg);
+  color: var(--universe-text);
+  text-align: center;
+  border-top: 1px solid color-mix(in srgb, var(--universe-primary) 25%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--universe-primary) 25%, transparent);
+}
+.suit-standby-emblem {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: grid;
+  place-items: center;
+  color: var(--universe-primary);
+}
+.suit-standby-ring {
+  position: absolute;
+  inset: 0;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0;
+  animation: suit-standby-ring 3s ease-out infinite;
+}
+.suit-standby-ring:nth-child(2) { animation-delay: 1s; }
+.suit-standby-ring:nth-child(3) { animation-delay: 2s; }
+@keyframes suit-standby-ring {
+  0%   { transform: scale(0.5); opacity: 0.9; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+.suit-standby-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.32em;
+  color: var(--universe-primary);
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.suit-standby-btn {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  letter-spacing: 0.3em;
+  background: transparent;
+  border: 1px solid var(--universe-primary);
+  color: var(--universe-primary);
+  padding: 0.7rem 1.6rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+.suit-standby-btn:hover {
+  background: var(--universe-primary);
+  color: var(--universe-bg);
+  box-shadow: 0 0 22px var(--universe-primary);
+}
+
+/* ============================================================
+   /suit standalone page (used in Step 4)
+   ============================================================ */
+.suit-page {
+  min-height: 100vh;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background: var(--universe-bg);
+  color: var(--universe-text);
+  font-family: var(--font-body);
+  position: relative;
+}
+.suit-page-back {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  color: var(--universe-primary);
+  text-decoration: none;
+  margin-bottom: 1.25rem;
+}
+.suit-page-back:hover { text-decoration: underline; }
+
+.suit-page-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--universe-primary);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+.suit-page-sub {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.22em;
+  opacity: 0.7;
+  margin-bottom: 1.5rem;
+}
+
+.suit-page-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.suit-page-grid > .suit-panel-mission {
+  grid-column: span 1;
+}
+@media (max-width: 1023px) {
+  .suit-page-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 639px) {
+  .suit-page-grid { grid-template-columns: 1fr; }
+}
+
+.suit-page-section {
+  margin-top: 2rem;
+}
+.suit-page-section h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--universe-primary);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+/* Mission log */
+.suit-mission-log {
+  display: grid;
+  gap: 0.75rem;
+}
+.suit-mission-entry {
+  border: 1px solid var(--universe-primary);
+  background: var(--universe-surface);
+  padding: 1rem 1.2rem;
+}
+.suit-mission-entry-classified .suit-mission-codename {
+  filter: blur(4px);
+  transition: filter 240ms ease;
+  cursor: help;
+}
+.suit-mission-entry-classified:hover .suit-mission-codename {
+  filter: blur(0);
+}
+.suit-clearance-flash {
+  display: inline-block;
+  margin-left: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  color: var(--universe-accent);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.suit-mission-entry-classified:hover .suit-clearance-flash {
+  opacity: 1;
+}
+
+/* Expanded augmentations list with bars */
+.suit-aug-list {
+  display: grid;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.suit-aug-row {
+  display: grid;
+  grid-template-columns: 14rem 1fr 3.5rem;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+}
+.suit-aug-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid color-mix(in srgb, var(--universe-primary) 60%, transparent);
+  overflow: hidden;
+}
+.suit-aug-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--universe-primary);
+  box-shadow: 0 0 10px var(--universe-primary);
+}
+
+/* ============================================================
+   RadarPanel (used in /suit page, Step 4)
+   ============================================================ */
+.suit-radar-svg {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  color: var(--universe-primary);
+}
+.suit-radar-sweep {
+  transform-origin: 50% 50%;
+  animation: suit-radar-sweep 4s linear infinite;
+}
+@keyframes suit-radar-sweep {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.suit-radar-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  fill: var(--universe-text);
+  opacity: 0.75;
+}
+.suit-radar-ring-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.32em;
+  fill: var(--universe-primary);
+  opacity: 0.9;
+}
+
+/* Per-mode radar blip tinting — the only place suit classes do real work. */
+.suit-earth1610 .radar-blip { fill: #ff7878; }
+.suit-earth65   .radar-blip { fill: #f5c6d0; }
+.suit-earth138  .radar-blip { fill: #f4e87a; }
+.suit-earth928  .radar-blip { fill: #5fe9ff; }
+
+/* ============================================================
+   Reduced motion safeguards
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .suit-hud-scanline,
+  .suit-threat-badge,
+  .suit-radar-sweep,
+  .suit-standby-ring,
+  .suit-active-threats,
+  .suit-panel {
+    animation: none !important;
+  }
+}

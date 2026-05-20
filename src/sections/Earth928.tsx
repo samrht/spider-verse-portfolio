@@ -1,9 +1,11 @@
 import { UniverseShell } from '../components/UniverseShell'
 import { ProjectCard } from '../components/ProjectCard'
 import { projects } from '../data/projects'
+import { useSuitStore } from '../store/suitStore'
 
 export function Earth928() {
   const list = projects.filter((p) => p.universe === 'earth-928')
+  const openSuit = useSuitStore((s) => s.openSuit)
 
   return (
     <UniverseShell universe="earth-928">
@@ -19,6 +21,19 @@ export function Earth928() {
             <ProjectCard key={p.id} {...p} />
           ))}
         </div>
+
+        <button
+          type="button"
+          className="suit-os-panel"
+          onClick={() => void openSuit()}
+          data-spider-sense
+          aria-label="Initialize the Spider-Man 2099 Suit OS"
+        >
+          <span className="suit-os-status">
+            ◈ SPIDER-MAN 2099 SUIT OS — AVAILABLE
+          </span>
+          <span className="suit-os-cta">[ INITIALIZE SUIT SYSTEMS ]</span>
+        </button>
       </div>
 
       <div className="universe-decor decor-earth-928" aria-hidden />
