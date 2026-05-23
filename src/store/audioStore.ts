@@ -36,6 +36,13 @@ export const useAudioStore = create<AudioState>()((set, get) => ({
     unlockAudio()
     setMuted(get().isMuted)
     set({ isUnlocked: true })
+    // Kick off ambient for the universe the visitor is currently in. Without
+    // this, ambient only ever started when the user *changed* universe — so
+    // anyone who loaded the page and never scrolled past Earth-1610 heard
+    // nothing. Gated by mute so the symbiote toggle still wins.
+    if (!get().isMuted) {
+      playAmbient(useUniverseStore.getState().activeUniverse)
+    }
   },
 
   toggleMute: () => {

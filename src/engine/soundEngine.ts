@@ -12,27 +12,34 @@ interface TrackDef {
   html5?: boolean
 }
 
-// Each track lists both .ogg and .mp3 so users can drop in either format
-// (or both) and Howler picks the first one that decodes.
+// Src order = files-we-actually-have first, then placeholder slots for any
+// higher-fidelity format the user might drop in later. Howler's src array
+// only falls through on codec-rejection (canPlayType), not on 404 — so the
+// existing format MUST be first or Howler gets stuck loading the missing
+// one and silently bails via onloaderror.
 const AMBIENT: Record<Universe, TrackDef> = {
-  'earth-1610': { src: ['/audio/ambient-1610.ogg', '/audio/ambient-1610.mp3'], volume: 0.28, loop: true, html5: true },
-  'earth-65':   { src: ['/audio/ambient-65.ogg',   '/audio/ambient-65.mp3'],   volume: 0.28, loop: true, html5: true },
-  'earth-138':  { src: ['/audio/ambient-138.ogg',  '/audio/ambient-138.mp3'],  volume: 0.32, loop: true, html5: true },
-  'earth-928':  { src: ['/audio/ambient-928.ogg',  '/audio/ambient-928.mp3'],  volume: 0.25, loop: true, html5: true },
+  'earth-1610': { src: ['/audio/ambient-1610.mp3', '/audio/ambient-1610.ogg'], volume: 0.28, loop: true, html5: true },
+  'earth-65':   { src: ['/audio/ambient-65.mp3',   '/audio/ambient-65.ogg'],   volume: 0.28, loop: true, html5: true },
+  'earth-138':  { src: ['/audio/ambient-138.mp3',  '/audio/ambient-138.ogg'],  volume: 0.32, loop: true, html5: true },
+  'earth-928':  { src: ['/audio/ambient-928.mp3',  '/audio/ambient-928.ogg'],  volume: 0.25, loop: true, html5: true },
 }
 
-// FX src order is .ogg → .mp3 → .wav. Howler picks the first that decodes,
-// so dropping a higher-fidelity .ogg/.mp3 alongside a shipped .wav silently
-// upgrades the sound — no code change needed.
+// Files-we-actually-have FIRST (.wav) then higher-fidelity placeholder slots
+// (.mp3, .ogg) for the user to drop in later. Howler picks the first src
+// whose codec the browser claims to support — so the missing-format-first
+// ordering trap that broke ambient (state stuck at "loading" because the
+// .ogg 404'd and onloaderror silently swallowed) doesn't repeat here.
+// fx-symbiote is still unsupplied; the slot exists so the symbiote toggle
+// can keep calling playFX('symbiote') without throwing.
 const FX: Record<string, TrackDef> = {
-  hover:         { src: ['/audio/fx-hover.ogg',         '/audio/fx-hover.mp3',         '/audio/fx-hover.wav'],       volume: 0.18 },
-  click:         { src: ['/audio/fx-click.ogg',         '/audio/fx-click.mp3',         '/audio/fx-click.wav'],       volume: 0.30 },
-  webshot:       { src: ['/audio/fx-webshot.ogg',       '/audio/fx-webshot.mp3',       '/audio/fx-webshot.wav'],     volume: 0.45 },
-  glitch:        { src: ['/audio/fx-glitch.ogg',        '/audio/fx-glitch.mp3',        '/audio/fx-glitch.wav'],      volume: 0.40 },
-  symbiote:      { src: ['/audio/fx-symbiote.ogg',      '/audio/fx-symbiote.mp3'],      volume: 0.55 },
-  'suit-boot':   { src: ['/audio/fx-suit-boot.ogg',     '/audio/fx-suit-boot.mp3',     '/audio/fx-suit-boot.wav'],   volume: 0.45 },
-  'mode-switch': { src: ['/audio/fx-mode-switch.ogg',   '/audio/fx-mode-switch.mp3',   '/audio/fx-mode-switch.wav'], volume: 0.35 },
-  'suit-close':  { src: ['/audio/fx-suit-close.ogg',    '/audio/fx-suit-close.mp3',    '/audio/fx-suit-close.wav'],  volume: 0.40 },
+  hover:         { src: ['/audio/fx-hover.wav',         '/audio/fx-hover.mp3',         '/audio/fx-hover.ogg'],       volume: 0.18 },
+  click:         { src: ['/audio/fx-click.wav',         '/audio/fx-click.mp3',         '/audio/fx-click.ogg'],       volume: 0.30 },
+  webshot:       { src: ['/audio/fx-webshot.wav',       '/audio/fx-webshot.mp3',       '/audio/fx-webshot.ogg'],     volume: 0.45 },
+  glitch:        { src: ['/audio/fx-glitch.wav',        '/audio/fx-glitch.mp3',        '/audio/fx-glitch.ogg'],      volume: 0.40 },
+  symbiote:      { src: ['/audio/fx-symbiote.mp3',      '/audio/fx-symbiote.ogg'],      volume: 0.55 },
+  'suit-boot':   { src: ['/audio/fx-suit-boot.wav',     '/audio/fx-suit-boot.mp3',     '/audio/fx-suit-boot.ogg'],   volume: 0.45 },
+  'mode-switch': { src: ['/audio/fx-mode-switch.wav',   '/audio/fx-mode-switch.mp3',   '/audio/fx-mode-switch.ogg'], volume: 0.35 },
+  'suit-close':  { src: ['/audio/fx-suit-close.wav',    '/audio/fx-suit-close.mp3',    '/audio/fx-suit-close.ogg'],  volume: 0.40 },
 }
 
 const ambientHowls = new Map<Universe, Howl>()
@@ -45,8 +52,12 @@ function makeHowl(def: TrackDef): Howl {
     volume: def.volume,
     loop: def.loop ?? false,
     html5: def.html5 ?? false,
-    preload: false,
-    // Swallow 404s silently for Phase 1 placeholder paths.
+    // Default preload (true). We previously set preload:false so Phase 1
+    // placeholder paths didn't 404-spam — but with html5:true, that pathway
+    // never triggers an actual load on .play(), so ambient stayed at state
+    // 'unloaded' forever. Real files exist now; let Howler load on construct.
+    // Still swallow load/play errors so a missing fx-symbiote.mp3 (etc.)
+    // doesn't break anything noisily.
     onloaderror: () => {},
     onplayerror: () => {},
   })

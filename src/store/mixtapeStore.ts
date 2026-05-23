@@ -11,6 +11,7 @@ import {
   getMixtapeDuration,
 } from '../engine/mixtapeEngine'
 import { useAudioStore } from './audioStore'
+import { useUniverseStore } from './universeStore'
 
 type RepeatMode = 'off' | 'all' | 'one'
 
@@ -121,6 +122,9 @@ export const useMixtapeStore = create<MixtapeState>()((set, get) => ({
     if (isPlaying) return
     const audio = useAudioStore.getState()
     audio.unlock()
+    // Silence the per-universe ambient so the mixtape isn't muddied by a
+    // background loop. pause()/onend resumes ambient symmetrically.
+    audio.stopAmbient()
     const effectiveVolume = audio.isMuted ? 0 : volume
     loadMixtapeTrack(MIXTAPE_TRACKS[currentIndex], true, effectiveVolume)
     set({ isPlaying: true })
@@ -129,6 +133,10 @@ export const useMixtapeStore = create<MixtapeState>()((set, get) => ({
   pause: () => {
     pauseMixtape()
     set({ isPlaying: false })
+    // Bring ambient back for the universe the visitor is currently in.
+    // playAmbient is a no-op if muted or already playing this universe.
+    const audio = useAudioStore.getState()
+    audio.playAmbient(useUniverseStore.getState().activeUniverse)
   },
 
   toggle: () => {
@@ -187,6 +195,7 @@ export const useMixtapeStore = create<MixtapeState>()((set, get) => ({
     const { volume } = get()
     const audio = useAudioStore.getState()
     audio.unlock()
+    audio.stopAmbient() // same reason as play(): no overlap between layers
     const effectiveVolume = audio.isMuted ? 0 : volume
     loadMixtapeTrack(MIXTAPE_TRACKS[index], true, effectiveVolume)
     set({ currentIndex: index, isPlaying: true, progress: 0, duration: 0 })
