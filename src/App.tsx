@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
 import { Home } from './pages/Home'
 
 // Phase 1 ships only `/`. The Phase 2/3 routes exist as locked stand-ins so
@@ -16,6 +16,14 @@ const Bugle = lazy(() =>
 // Phase 2: /suit is now the live Spider-Suit HUD dashboard.
 const Suit = lazy(() =>
   import('./pages/Suit').then((m) => ({ default: m.Suit })),
+)
+// Phase 2 add-on: /mixtape is the Spider-Verse OST player.
+const Mixtape = lazy(() =>
+  import('./pages/Mixtape').then((m) => ({ default: m.Mixtape })),
+)
+// Mini-player mounted in the root layout so it persists across every route.
+const MixtapeHUD = lazy(() =>
+  import('./components/MixtapeHUD/MixtapeHUD').then((m) => ({ default: m.MixtapeHUD })),
 )
 
 const locked = (phase: 2 | 3, concept: string) => (
@@ -38,22 +46,48 @@ const suitRoute = (
   </Suspense>
 )
 
+const mixtapeRoute = (
+  <Suspense fallback={<div style={{ position: 'fixed', inset: 0, background: '#0a0015' }} />}>
+    <Mixtape />
+  </Suspense>
+)
+
+// Root layout wraps every route so the mixtape mini-HUD is always mounted.
+// Mixtape audio is global (Howler runs outside React), but the HUD's controls
+// need a single React tree to read from the store — RootLayout gives us that.
+function RootLayout() {
+  return (
+    <>
+      <Outlet />
+      <Suspense fallback={null}>
+        <MixtapeHUD />
+      </Suspense>
+    </>
+  )
+}
+
 const router = createBrowserRouter([
-  { path: '/', element: <Home /> },
+  {
+    element: <RootLayout />,
+    children: [
+      { path: '/', element: <Home /> },
 
-  // Phase 2
-  { path: '/suit',  element: suitRoute },
-  { path: '/bugle', element: bugleRoute },
-  { path: '/story', element: locked(2, 'The Story') },
+      // Phase 2
+      { path: '/suit',    element: suitRoute },
+      { path: '/bugle',   element: bugleRoute },
+      { path: '/mixtape', element: mixtapeRoute },
+      { path: '/story',   element: locked(2, 'The Story') },
 
-  // Phase 3 — locked
-  { path: '/mission',    element: locked(3, 'The Mission') },
-  { path: '/multiverse', element: locked(3, 'The Multiverse') },
-  { path: '/visualizer', element: locked(3, 'Music Visualizer') },
-  { path: '/cyber',      element: locked(3, 'CyberSpider') },
+      // Phase 3 — locked
+      { path: '/mission',    element: locked(3, 'The Mission') },
+      { path: '/multiverse', element: locked(3, 'The Multiverse') },
+      { path: '/visualizer', element: locked(3, 'Music Visualizer') },
+      { path: '/cyber',      element: locked(3, 'CyberSpider') },
 
-  // Fallback — anything else gets the multiverse veil too.
-  { path: '*', element: locked(2, 'Unknown Universe') },
+      // Fallback — anything else gets the multiverse veil too.
+      { path: '*', element: locked(2, 'Unknown Universe') },
+    ],
+  },
 ])
 
 function App() {

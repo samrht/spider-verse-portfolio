@@ -21,14 +21,14 @@ const AMBIENT: Record<Universe, TrackDef> = {
   'earth-928':  { src: ['/audio/ambient-928.ogg',  '/audio/ambient-928.mp3'],  volume: 0.25, loop: true, html5: true },
 }
 
-// Suit HUD FX list .ogg / .mp3 first (placeholder slots for studio-grade
-// audio the user can drop in later) then .wav — the .wav files ship today
-// via scripts/generate-suit-fx.py (procedurally synthesised, CC0).
+// FX src order is .ogg → .mp3 → .wav. Howler picks the first that decodes,
+// so dropping a higher-fidelity .ogg/.mp3 alongside a shipped .wav silently
+// upgrades the sound — no code change needed.
 const FX: Record<string, TrackDef> = {
-  hover:         { src: ['/audio/fx-hover.ogg',         '/audio/fx-hover.mp3'],         volume: 0.18 },
-  click:         { src: ['/audio/fx-click.ogg',         '/audio/fx-click.mp3'],         volume: 0.30 },
-  webshot:       { src: ['/audio/fx-webshot.ogg',       '/audio/fx-webshot.mp3'],       volume: 0.45 },
-  glitch:        { src: ['/audio/fx-glitch.ogg',        '/audio/fx-glitch.mp3'],        volume: 0.40 },
+  hover:         { src: ['/audio/fx-hover.ogg',         '/audio/fx-hover.mp3',         '/audio/fx-hover.wav'],       volume: 0.18 },
+  click:         { src: ['/audio/fx-click.ogg',         '/audio/fx-click.mp3',         '/audio/fx-click.wav'],       volume: 0.30 },
+  webshot:       { src: ['/audio/fx-webshot.ogg',       '/audio/fx-webshot.mp3',       '/audio/fx-webshot.wav'],     volume: 0.45 },
+  glitch:        { src: ['/audio/fx-glitch.ogg',        '/audio/fx-glitch.mp3',        '/audio/fx-glitch.wav'],      volume: 0.40 },
   symbiote:      { src: ['/audio/fx-symbiote.ogg',      '/audio/fx-symbiote.mp3'],      volume: 0.55 },
   'suit-boot':   { src: ['/audio/fx-suit-boot.ogg',     '/audio/fx-suit-boot.mp3',     '/audio/fx-suit-boot.wav'],   volume: 0.45 },
   'mode-switch': { src: ['/audio/fx-mode-switch.ogg',   '/audio/fx-mode-switch.mp3',   '/audio/fx-mode-switch.wav'], volume: 0.35 },

@@ -9,6 +9,7 @@ interface Portal {
 const PORTALS: Portal[] = [
   { path: '/suit',       label: 'Spider-Suit HUD', phase: 2 },
   { path: '/bugle',      label: 'Daily Bugle',     phase: 2 },
+  { path: '/mixtape',    label: 'The Mixtape',     phase: 2 },
   { path: '/story',      label: 'The Story',       phase: 2 },
   { path: '/mission',    label: 'The Mission',     phase: 3 },
   { path: '/multiverse', label: 'The Multiverse',  phase: 3 },
