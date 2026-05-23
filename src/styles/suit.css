@@ -122,10 +122,14 @@
   gap: 1rem;
 }
 
-.suit-panel-chron   { grid-area: chron; }
-.suit-panel-atmos   { grid-area: atmos; }
-.suit-panel-fluid   { grid-area: fluid; }
-.suit-panel-mission { grid-area: mission; }
+/* Grid-area assignments MUST stay scoped to the overlay grid. The /suit
+   page uses a different layout (see .suit-page-grid below) and would
+   otherwise collapse every panel into cell (1,1) because the named areas
+   it references don't exist there. */
+.suit-hud-grid > .suit-panel-chron   { grid-area: chron; }
+.suit-hud-grid > .suit-panel-atmos   { grid-area: atmos; }
+.suit-hud-grid > .suit-panel-fluid   { grid-area: fluid; }
+.suit-hud-grid > .suit-panel-mission { grid-area: mission; }
 
 @media (max-width: 767px) {
   .suit-hud-grid {
@@ -584,17 +588,37 @@
 .suit-page-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-template-areas:
+    'page-chron page-atmos page-radar'
+    'page-fluid page-mission page-mission';
   gap: 1rem;
   margin-bottom: 2rem;
 }
-.suit-page-grid > .suit-panel-mission {
-  grid-column: span 1;
-}
+.suit-page-grid > .suit-panel-chron   { grid-area: page-chron; }
+.suit-page-grid > .suit-panel-atmos   { grid-area: page-atmos; }
+.suit-page-grid > .suit-panel-radar   { grid-area: page-radar; }
+.suit-page-grid > .suit-panel-fluid   { grid-area: page-fluid; }
+.suit-page-grid > .suit-panel-mission { grid-area: page-mission; }
+
 @media (max-width: 1023px) {
-  .suit-page-grid { grid-template-columns: repeat(2, 1fr); }
+  .suit-page-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      'page-chron page-atmos'
+      'page-radar page-fluid'
+      'page-mission page-mission';
+  }
 }
 @media (max-width: 639px) {
-  .suit-page-grid { grid-template-columns: 1fr; }
+  .suit-page-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'page-chron'
+      'page-atmos'
+      'page-radar'
+      'page-fluid'
+      'page-mission';
+  }
 }
 
 .suit-page-section {
