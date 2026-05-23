@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import gsap from 'gsap'
 import glitchFrag from '../shaders/glitch.frag?raw'
 import { useUniverseStore, type Universe } from '../store/universeStore'
+import { useAudioStore } from '../store/audioStore'
 import { prefersReducedMotion } from './motion'
 
 // Universe-switch glitch overlay.
@@ -42,6 +43,11 @@ export function triggerUniverseTransition(
     return
   }
   inFlight = true
+
+  // Fire glitch FX at the start of the transition so the audio builds with
+  // the visual intensity ramp (peak ~300ms in). audioStore gates on
+  // isUnlocked + !isMuted.
+  useAudioStore.getState().playFX('glitch')
 
   const canvas = document.createElement('canvas')
   canvas.style.cssText = `

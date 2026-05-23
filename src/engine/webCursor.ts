@@ -1,5 +1,6 @@
 import gsap from 'gsap'
 import { prefersReducedMotion } from './motion'
+import { useAudioStore } from '../store/audioStore'
 
 // Full-spec web cursor:
 // - Hides the native cursor on <html>
@@ -60,6 +61,9 @@ export function initCursor(): () => void {
   const onClick = (e: MouseEvent) => {
     if (reduceMotion) return
     fireWebShoot(svg, { x: e.clientX, y: e.clientY })
+    // Matches the visual web-thread spawn. audioStore gates on
+    // isUnlocked + !isMuted, so the symbiote toggle still wins.
+    useAudioStore.getState().playFX('webshot')
   }
 
   // Hover hint over clickable elements
