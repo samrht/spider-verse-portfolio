@@ -8,9 +8,12 @@
  * ===================================================================== */
 
 .mixtape-hud {
+  /* Anchored top-right because KAREN owns the bottom-right corner and the
+   * Daily Bugle owns the full left edge. Top-right is the only persistent
+   * UI slot still open. Expanded card flows downward from the chip. */
   position: fixed;
   right: clamp(12px, 2.5vw, 28px);
-  bottom: clamp(12px, 2.5vw, 28px);
+  top: clamp(12px, 2.5vw, 28px);
   z-index: 9000;
   pointer-events: auto;
   color: var(--universe-text);
@@ -20,7 +23,7 @@
 @media (max-width: 480px) {
   .mixtape-hud {
     right: 8px;
-    bottom: 8px;
+    top: 8px;
   }
 }
 
