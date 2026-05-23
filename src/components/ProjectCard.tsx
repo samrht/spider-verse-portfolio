@@ -1,4 +1,5 @@
 import type { Project } from '../data/projects'
+import { useAudioStore } from '../store/audioStore'
 
 type Props = Project
 
@@ -12,6 +13,7 @@ export function ProjectCard({ title, description, tags, link, repoLink, image }:
     <Wrapper
       {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : {})}
       data-spider-sense
+      onMouseEnter={() => useAudioStore.getState().playFX('hover')}
       className="group relative block p-6 no-underline transition-transform duration-200 hover:-translate-y-1"
       style={{
         background: 'var(--universe-surface)',
