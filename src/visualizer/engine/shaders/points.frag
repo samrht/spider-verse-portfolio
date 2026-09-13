@@ -18,4 +18,5 @@ void main() {
   col = mix(col, vec3(1.0), uBeat * core * 0.8);
   float alpha = mix(0.95, 0.45, vDepth);
   gl_FragColor = vec4(col, alpha);
+  #include <colorspace_fragment>
 }

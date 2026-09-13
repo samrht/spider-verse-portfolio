@@ -58,19 +58,20 @@ export class ParticleField {
       depthWrite: false,
       blending: THREE.AdditiveBlending,
     })
-    this.geometry = this.buildGeometry(n)
+    this.geometry = this.buildGeometry(n, 'sphere', 'sphere')
     this.points = new THREE.Points(this.geometry, this.material)
     this.points.frustumCulled = false
   }
 
-  private buildGeometry(n: number): THREE.BufferGeometry {
+  private buildGeometry(n: number, from: TargetName, to: TargetName): THREE.BufferGeometry {
     const g = new THREE.BufferGeometry()
-    const sphere = bakeTarget('sphere', n, this.seed)
+    const a = bakeTarget(from, n, this.seed)
+    const b = bakeTarget(to, n, this.seed)
     const seeds = new Float32Array(n)
     for (let i = 0; i < n; i++) seeds[i] = ((i * 2654435761) >>> 0) / 4294967296
     g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3))
-    g.setAttribute('aTargetA', new THREE.BufferAttribute(Float32Array.from(sphere), 3))
-    g.setAttribute('aTargetB', new THREE.BufferAttribute(Float32Array.from(sphere), 3))
+    g.setAttribute('aTargetA', new THREE.BufferAttribute(Float32Array.from(a), 3))
+    g.setAttribute('aTargetB', new THREE.BufferAttribute(Float32Array.from(b), 3))
     g.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1))
     return g
   }
@@ -120,15 +121,17 @@ export class ParticleField {
     this.u.uTime.value += dt
   }
 
-  // Frame-time guard from spec §7: rebuild at half N, once.
+  // Frame-time guard from spec §7: rebuild at half N, once. Rebake the
+  // morph's current from/to shapes (not 'sphere'/'sphere') so the field
+  // doesn't snap to a sphere mid-morph; update() keeps driving uMorph from
+  // morph.progress every frame, so no uniform write is needed here.
   halve(): void {
     const n = Math.max(1000, Math.floor(this.n / 2))
     const old = this.geometry
     this.n = n
-    this.geometry = this.buildGeometry(n)
+    this.geometry = this.buildGeometry(n, this.morph.from, this.morph.to)
     this.points.geometry = this.geometry
     old.dispose()
-    this.u.uMorph.value = 1
   }
 
   dispose(): void {

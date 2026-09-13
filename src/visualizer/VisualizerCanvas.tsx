@@ -7,6 +7,7 @@ import { chooseDotCount } from './dotCount'
 import { useUniverseStore } from '../store/universeStore'
 import { prefersReducedMotion, onReducedMotionChange } from '../engine/motion'
 import { DebugOverlay } from './debug/DebugOverlay'
+import { nextOver } from './frameGuard'
 
 export interface VisualizerCanvasProps {
   signal: AudioSignal          // mutated in place by the active provider
@@ -19,6 +20,7 @@ export interface VisualizerCanvasProps {
 // Synchronous probe: a real GL context check, no async work, safe under
 // jsdom (which has no WebGL and simply returns false).
 function hasWebGL(): boolean {
+  if (typeof WebGLRenderingContext === 'undefined') return false
   try {
     const c = document.createElement('canvas')
     return !!(c.getContext('webgl2') || c.getContext('webgl'))
@@ -51,9 +53,11 @@ function Field({ signal, nowSeconds, trackKey, debug }: VisualizerCanvasProps) {
 
   useFrame((_, dt) => {
     field.update(signal, nowSeconds(), dt)
-    // spec §7: > 24 ms for 2 s → halve N once
+    // spec §7: > 24 ms for 2 s → halve N once. A backgrounded tab can
+    // resume with a multi-second dt; frameGuard's nextOver treats that as
+    // a stall and resets rather than accumulating.
     if (!slow.current.halved) {
-      slow.current.over = dt > 0.024 ? slow.current.over + dt : 0
+      slow.current.over = nextOver(slow.current.over, dt)
       if (slow.current.over >= 2) {
         field.halve()
         slow.current.halved = true

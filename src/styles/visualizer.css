@@ -8,7 +8,11 @@
 .viz-canvas canvas { display: block; width: 100%; height: 100%; }
 
 .viz-debug {
-  position: fixed;
+  /* drei's <Html fullscreen> wrapper carries its own transform, which
+     becomes the containing block for a fixed descendant — absolute here
+     pins the readout to that wrapper's top-left (the viewport corner)
+     instead of the scene origin. */
+  position: absolute;
   top: 12px;
   left: 12px;
   margin: 0;
