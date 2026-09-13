@@ -24,6 +24,7 @@ interface MixtapeState {
   progress: number
   duration: number
   shuffleOrder: number[]
+  deckHidden: boolean
 
   play: () => void
   pause: () => void
@@ -35,6 +36,7 @@ interface MixtapeState {
   cycleRepeat: () => void
   setVolume: (v: number) => void
   seek: (s: number) => void
+  setDeckHidden: (v: boolean) => void
 }
 
 const STORAGE_KEY = 'spv-mixtape'
@@ -116,6 +118,7 @@ export const useMixtapeStore = create<MixtapeState>()((set, get) => ({
   progress: 0,
   duration: 0,
   shuffleOrder: initial.shuffle ? buildShuffleOrder(initial.currentIndex) : [],
+  deckHidden: false,
 
   play: () => {
     const { currentIndex, volume, isPlaying } = get()
@@ -230,6 +233,8 @@ export const useMixtapeStore = create<MixtapeState>()((set, get) => ({
     seekMixtape(s)
     set({ progress: s })
   },
+
+  setDeckHidden: (v) => set({ deckHidden: v }),
 }))
 
 // Wire engine callbacks once at module load.

@@ -26,4 +26,63 @@
   z-index: 50;
 }
 
-.mixtape-page > *:not(.viz-canvas) { position: relative; z-index: 1; }
+.viz-page { position: relative; min-height: 100vh; overflow: hidden; }
+.viz-back { position: fixed; top: 16px; left: 16px; z-index: 5; }
+.viz-topright { position: fixed; top: 16px; right: 16px; z-index: 5; display: flex; gap: 8px; align-items: center; }
+
+.viz-badge {
+  font: 700 11px/1 'Share Tech Mono', ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  padding: 5px 8px;
+  border-radius: 2px;
+  background: var(--universe-primary, #ff2d2d);
+  color: #fff;
+}
+.viz-badge[data-kind='beatmap'] { background: #00d4ff; color: #000; }
+.viz-badge[data-kind='procedural'], .viz-badge[data-kind='idle'] { background: rgba(255,255,255,0.14); color: #ddd; }
+
+.viz-deck {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  background: rgba(10, 10, 14, 0.86);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+  will-change: transform;
+}
+.viz-deck-bar { display: flex; align-items: center; gap: 16px; padding: 10px 16px; }
+.viz-reels { display: flex; gap: 8px; }
+.viz-reel {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.7);
+  border-top-color: var(--universe-primary, #ff2d2d);
+}
+.viz-deck.is-playing .viz-reel { animation: viz-spin 1.6s linear infinite; }
+@keyframes viz-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .viz-deck.is-playing .viz-reel { animation: none; } }
+.viz-deck-now { min-width: 160px; }
+.viz-deck-title { margin: 0; font-size: 15px; line-height: 1.1; }
+.viz-deck-artist { margin: 2px 0 0; opacity: 0.7; font-size: 12px; }
+.viz-deck-scrub { flex: 1; min-width: 120px; }
+.viz-deck-scrub input[type='range'] { width: 100%; }
+.viz-deck-transport { display: flex; align-items: center; gap: 6px; }
+.viz-deck-transport .mixtape-volume { margin-left: 8px; }
+
+.viz-tracklist {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.35s ease;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.viz-tracklist.is-open { max-height: 50vh; overflow: auto; }
+
+/* 12px hover strip that brings the deck back while hidden */
+.viz-deck-reveal {
+  position: fixed; left: 0; right: 0; bottom: 0; height: 12px; z-index: 11;
+  background: transparent; border: 0; cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .viz-deck-bar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+  .viz-deck-now { min-width: 0; flex: 1 1 100%; }
+  .viz-deck-scrub { flex: 1 1 100%; }
+  .viz-deck-transport { flex: 1 1 100%; justify-content: space-between; }
+  .viz-deck-transport .mixtape-volume { display: none; }
+}
