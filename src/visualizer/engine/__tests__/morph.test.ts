@@ -70,6 +70,18 @@ describe('MorphMachine', () => {
     expect(m.update(4.1)).toEqual({ type: 'start', from: 'explosion', to: 'sphere' })
   })
 
+  it('explosion return overrides pending section even if onSection runs before update', () => {
+    const m = new MorphMachine({ dwellS: 0, emblemS: 0 })
+    m.onSection(1, 'drop', 0)
+    m.update(0)
+    m.update(0.9)
+    expect(m.to).toBe('explosion')
+    // new section arrives at exact time explosion window elapses
+    m.onSection(2, 'mid', 4)
+    // update at 4.1 should return to sphere, not morph to web
+    expect(m.update(4.1)).toEqual({ type: 'start', from: 'explosion', to: 'sphere' })
+  })
+
   it('does nothing when disabled (reduced motion)', () => {
     const m = new MorphMachine({ enabled: false })
     m.onTrackStart(0)

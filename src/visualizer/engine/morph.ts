@@ -26,10 +26,10 @@ export function targetForSection(e: SectionEnergy): TargetName {
 }
 
 export class MorphMachine {
-  from: TargetName = 'sphere'
-  to: TargetName = 'sphere'
-  progress = 1
-  transitioning = false
+  private from_: TargetName = 'sphere'
+  private to_: TargetName = 'sphere'
+  private progress_ = 1
+  private transitioning_ = false
 
   private readonly transitionS: number
   private readonly dwellS: number
@@ -43,6 +43,11 @@ export class MorphMachine {
   private pending: TargetName | null = null
   private emblemUntil = -Infinity
   private lastSection = -1
+
+  get from(): TargetName { return this.from_ }
+  get to(): TargetName { return this.to_ }
+  get progress(): number { return this.progress_ }
+  get transitioning(): boolean { return this.transitioning_ }
 
   constructor(opts: MorphOptions = {}) {
     this.transitionS = (opts.transitionMs ?? 900) / 1000
@@ -58,7 +63,6 @@ export class MorphMachine {
     if (this.emblemS > 0) {
       this.emblemUntil = nowS + this.emblemS
       this.pending = 'emblem'
-      this.arrivedAt = -Infinity // emblem ignores dwell
     }
   }
 
@@ -78,11 +82,11 @@ export class MorphMachine {
   update(nowS: number): MorphEvent | null {
     if (!this.enabled) return null
 
-    if (this.transitioning) {
-      this.progress = Math.min(1, (nowS - this.startedAt) / this.transitionS)
-      if (this.progress >= 1) {
-        this.transitioning = false
-        this.from = this.to
+    if (this.transitioning_) {
+      this.progress_ = Math.min(1, (nowS - this.startedAt) / this.transitionS)
+      if (this.progress_ >= 1) {
+        this.transitioning_ = false
+        this.from_ = this.to_
       }
       return null
     }
@@ -93,25 +97,25 @@ export class MorphMachine {
       this.pendingAfterEmblem = null
     }
 
-    // explosion always snaps back
-    if (this.to === 'explosion' && nowS - this.arrivedAt >= this.explosionReturnS && this.pending === null) {
+    // explosion always snaps back, overriding any other pending target
+    if (this.to_ === 'explosion' && nowS - this.arrivedAt >= this.explosionReturnS) {
       this.pending = 'sphere'
     }
 
     if (this.pending === null) return null
     const next = this.pending
-    if (next === this.to) { this.pending = null; return null }
-    const dwellOk = next === 'emblem' || nowS - this.arrivedAt >= this.dwellS
+    if (next === this.to_) { this.pending = null; return null }
+    const dwellOk = next === 'emblem' || next === 'sphere' || nowS - this.arrivedAt >= this.dwellS
     if (!dwellOk) return null
 
     this.pending = null
-    const ev: MorphEvent = { type: 'start', from: this.to, to: next }
-    this.from = this.to
-    this.to = next
+    const ev: MorphEvent = { type: 'start', from: this.to_, to: next }
+    this.from_ = this.to_
+    this.to_ = next
     this.startedAt = nowS
     this.arrivedAt = nowS
-    this.progress = 0
-    this.transitioning = true
+    this.progress_ = 0
+    this.transitioning_ = true
     return ev
   }
 }
