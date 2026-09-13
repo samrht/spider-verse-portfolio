@@ -3,9 +3,14 @@ import { BAND_HZ, bandAverage, binRange, smooth } from './bands'
 import { OnsetDetector } from './onset'
 import { SectionDetector } from './sections'
 
-// Tier A. MediaElementSource → AnalyserNode → destination. One source per
-// element for the lifetime of the page (createMediaElementSource throws on
-// a second call for the same element), so sources are cached module-wide.
+// Tier A. Once an element is routed through a MediaElementSource, that is
+// its ONLY path to speakers — so the source connects to destination once,
+// permanently, the first time it's created. The analyser is a parallel tap
+// on the source (source → analyser, not source → analyser → destination);
+// stop() detaches only that tap, so audio keeps playing after stop(). One
+// source per element for the lifetime of the page (createMediaElementSource
+// throws on a second call for the same element), so sources are cached
+// module-wide.
 
 const sources = new WeakMap<HTMLMediaElement, MediaElementAudioSourceNode>()
 let sharedCtx: AudioContext | null = null
@@ -21,6 +26,7 @@ function defaultCtx(): AudioContext {
 export class LiveFFT implements SignalProvider {
   readonly mode = 'live' as const
   private ctx: AudioContext | null = null
+  private source: MediaElementAudioSourceNode | null = null
   private analyser: AnalyserNode | null = null
   private bins = new Uint8Array(512)
   private ranges = { bass: [0, 1] as [number, number], mids: [0, 1] as [number, number], highs: [0, 1] as [number, number] }
@@ -47,13 +53,15 @@ export class LiveFFT implements SignalProvider {
     let source = sources.get(this.el)
     if (!source) {
       source = this.ctx.createMediaElementSource(this.el)
+      // Permanent: this is the element's only remaining path to speakers.
+      source.connect(this.ctx.destination)
       sources.set(this.el, source)
     }
+    this.source = source
     const analyser = this.ctx.createAnalyser()
     analyser.fftSize = 1024
     analyser.smoothingTimeConstant = 0.6
     source.connect(analyser)
-    analyser.connect(this.ctx.destination)
     this.analyser = analyser
     this.bins = new Uint8Array(analyser.frequencyBinCount)
     const sr = this.ctx.sampleRate
@@ -66,8 +74,9 @@ export class LiveFFT implements SignalProvider {
   }
 
   stop(): void {
-    // Keep the source (it is bound to the element for life); drop the analyser.
-    this.analyser?.disconnect()
+    // Detach only the analyser tap; source → destination stays connected so
+    // playback (e.g. navigating away from /mixtape) doesn't go silent.
+    if (this.analyser) this.source?.disconnect(this.analyser)
     this.analyser = null
     this.sections.reset()
   }

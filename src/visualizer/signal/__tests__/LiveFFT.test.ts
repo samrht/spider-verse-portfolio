@@ -11,7 +11,7 @@ function fakeCtx(level: { v: number }) {
     connect: vi.fn(),
     getByteFrequencyData: (arr: Uint8Array) => arr.fill(level.v),
   }
-  const source = { connect: vi.fn() }
+  const source = { connect: vi.fn(), disconnect: vi.fn() }
   const ctx = {
     sampleRate: 44100,
     state: 'running',
@@ -32,8 +32,27 @@ describe('LiveFFT', () => {
     await p.start()
     await p.start()
     expect((ctx.createMediaElementSource as unknown as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1)
+    // Source → destination is the element's only path to speakers, so it is
+    // wired exactly once (permanently), even across a second start() call.
+    const destCalls = (source.connect as unknown as ReturnType<typeof vi.fn>).mock.calls.filter(
+      (args) => args[0] === ctx.destination,
+    )
+    expect(destCalls.length).toBe(1)
     expect(source.connect).toHaveBeenCalledWith(analyser)
-    expect(analyser.connect).toHaveBeenCalledWith(ctx.destination)
+    // The analyser is a parallel tap only — it must not also feed destination
+    // (that would double the audio).
+    expect(analyser.connect).not.toHaveBeenCalled()
+  })
+
+  it('stop() detaches only the analyser tap, leaving source → destination connected', async () => {
+    const level = { v: 0 }
+    const { ctx, source, analyser } = fakeCtx(level)
+    const p = new LiveFFT(document.createElement('audio'), () => ctx)
+    await p.start()
+    p.stop()
+    expect(source.disconnect).toHaveBeenCalledWith(analyser)
+    expect(source.disconnect).not.toHaveBeenCalledWith(ctx.destination)
+    expect(source.connect).toHaveBeenCalledWith(ctx.destination)
   })
   it('reports live mode and tracks level', async () => {
     const level = { v: 0 }
