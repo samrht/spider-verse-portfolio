@@ -1,8 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMixtapeStore } from '../store/mixtapeStore'
 import { MIXTAPE_TRACKS, MOVIE_LABEL } from '../data/mixtape'
+import { VisualizerCanvas } from '../visualizer/VisualizerCanvas'
+import { Procedural } from '../visualizer/signal/Procedural'
+import { createSignal } from '../visualizer/signal/types'
 import '../styles/mixtape.css'
+import '../styles/visualizer.css'
 
 // Full /mixtape page. Sets data-universe="earth-1610" on <html> so the page
 // inherits Miles' Brooklyn palette (the album's centre of gravity), then
@@ -38,8 +42,22 @@ export function Mixtape() {
   const pct = duration > 0 ? (progress / duration) * 100 : 0
   const repeatGlyph = repeat === 'one' ? '↻¹' : repeat === 'all' ? '↻' : '⤿'
 
+  // Task 6 scaffold: procedural-only drive. Task 7 swaps in useSignal().
+  const signal = useMemo(() => createSignal('procedural'), [])
+  const provider = useMemo(() => new Procedural(), [])
+  const [t0] = useState(() => performance.now())
+  const nowSeconds = useMemo(() => () => (performance.now() - t0) / 1000, [t0])
+  useEffect(() => {
+    let raf = 0
+    const loop = () => { provider.sample(signal, nowSeconds()); raf = requestAnimationFrame(loop) }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [provider, signal, nowSeconds])
+  const debug = new URLSearchParams(window.location.search).has('debug')
+
   return (
     <main className="mixtape-page" data-universe="earth-1610">
+      <VisualizerCanvas signal={signal} nowSeconds={nowSeconds} trackKey={track.slug} debug={debug} />
       <Link to="/" className="mixtape-page-back">← BACK TO MOTHERSHIP</Link>
 
       <header className="mixtape-page-header">
