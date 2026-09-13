@@ -43,6 +43,7 @@ export class MorphMachine {
   private pending: TargetName | null = null
   private emblemUntil = -Infinity
   private lastSection = -1
+  private forcedReturn = false      // marks pending = 'sphere' from explosion timeout
 
   get from(): TargetName { return this.from_ }
   get to(): TargetName { return this.to_ }
@@ -100,15 +101,17 @@ export class MorphMachine {
     // explosion always snaps back, overriding any other pending target
     if (this.to_ === 'explosion' && nowS - this.arrivedAt >= this.explosionReturnS) {
       this.pending = 'sphere'
+      this.forcedReturn = true
     }
 
     if (this.pending === null) return null
     const next = this.pending
     if (next === this.to_) { this.pending = null; return null }
-    const dwellOk = next === 'emblem' || next === 'sphere' || nowS - this.arrivedAt >= this.dwellS
+    const dwellOk = next === 'emblem' || this.forcedReturn || nowS - this.arrivedAt >= this.dwellS
     if (!dwellOk) return null
 
     this.pending = null
+    this.forcedReturn = false
     const ev: MorphEvent = { type: 'start', from: this.to_, to: next }
     this.from_ = this.to_
     this.to_ = next

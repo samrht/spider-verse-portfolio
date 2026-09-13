@@ -82,6 +82,20 @@ describe('MorphMachine', () => {
     expect(m.update(4.1)).toEqual({ type: 'start', from: 'explosion', to: 'sphere' })
   })
 
+  it('forced explosion return bypasses dwell, but regular sphere target respects dwell', () => {
+    const m = new MorphMachine({ dwellS: 6, emblemS: 0 })
+    m.onSection(1, 'mid', 0)
+    m.update(0)
+    m.update(1)
+    expect(m.to).toBe('web')
+    // new section requests sphere (low) at only 2 s, dwell not met
+    m.onSection(2, 'low', 2)
+    expect(m.update(2)).toBeNull() // dwell check blocks it
+    expect(m.to).toBe('web')
+    // at 7 s, dwell is satisfied, sphere transition happens
+    expect(m.update(7)).toEqual({ type: 'start', from: 'web', to: 'sphere' })
+  })
+
   it('does nothing when disabled (reduced motion)', () => {
     const m = new MorphMachine({ enabled: false })
     m.onTrackStart(0)
