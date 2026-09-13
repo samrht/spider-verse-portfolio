@@ -1,0 +1,76 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMixtapeStore } from '../store/mixtapeStore'
+import { getMediaElement } from '../engine/mixtapeEngine'
+import { MIXTAPE_TRACKS } from '../data/mixtape'
+import { createSignal, type SignalProvider } from './signal/types'
+import { Procedural } from './signal/Procedural'
+import { LiveFFT } from './signal/LiveFFT'
+import { selectProvider, type ProviderKind } from './signal/select'
+
+// Owns the active SignalProvider for the page and samples it once per
+// animation frame into a single mutable AudioSignal (the canvas reads the
+// same object — no React state on the hot path). Beat-map and Spotify
+// inputs arrive in Tasks 9 and 11; until then they are constant `null`.
+
+export interface SignalInputs {
+  beatMapFor?: (slug: string) => boolean          // T9
+  makeBeatMap?: (slug: string, position: () => number) => SignalProvider | null // T9
+  spotify?: { playing: boolean; slug: string | null; position: () => number } | null // T11
+}
+
+export function useSignal(inputs: SignalInputs = {}) {
+  const signal = useMemo(() => createSignal('procedural'), [])
+  const isPlaying = useMixtapeStore((s) => s.isPlaying)
+  const currentIndex = useMixtapeStore((s) => s.currentIndex)
+  const progress = useMixtapeStore((s) => s.progress)
+  const slug = MIXTAPE_TRACKS[currentIndex].slug
+  const progressRef = useRef(progress)
+  useEffect(() => { progressRef.current = progress })
+
+  const spotify = inputs.spotify ?? null
+  const kind: ProviderKind = selectProvider({
+    localPlaying: isPlaying,
+    analyserAvailable: LiveFFT.available() && getMediaElement() !== null,
+    localHasBeatMap: inputs.beatMapFor?.(slug) ?? false,
+    spotifyPlaying: !!spotify?.playing,
+    spotifyHasBeatMap: !!(spotify?.slug && inputs.beatMapFor?.(spotify.slug)),
+  })
+
+  // Lazily stamped in an effect rather than a useRef initializer: reading
+  // performance.now() during render is an impure call under react-hooks/purity.
+  const t0 = useRef(0)
+  useEffect(() => { t0.current = performance.now() }, [])
+  const nowSeconds = useMemo(() => {
+    if (kind === 'live' || (kind === 'beatmap' && isPlaying)) return () => progressRef.current
+    if (kind === 'beatmap' && spotify) return spotify.position
+    return () => (performance.now() - t0.current) / 1000
+  }, [kind, isPlaying, spotify])
+
+  const [provider, setProvider] = useState<SignalProvider | null>(null)
+  useEffect(() => {
+    let p: SignalProvider | null = null
+    if (kind === 'live') {
+      const el = getMediaElement()
+      if (el) p = new LiveFFT(el)
+    } else if (kind === 'beatmap') {
+      const s = isPlaying ? slug : spotify?.slug ?? slug
+      p = inputs.makeBeatMap?.(s, nowSeconds) ?? null
+    }
+    if (!p) p = new Procedural({ idle: kind === 'idle' })
+    let cancelled = false
+    p.start().then(() => { if (!cancelled) setProvider(p) })
+    return () => { cancelled = true; p?.stop() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kind, slug, isPlaying, spotify?.slug])
+
+  useEffect(() => {
+    if (!provider) return
+    let raf = 0
+    const loop = () => { provider.sample(signal, nowSeconds()); raf = requestAnimationFrame(loop) }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [provider, signal, nowSeconds])
+
+  const trackKey = kind === 'live' || (kind === 'beatmap' && isPlaying) ? slug : spotify?.slug ?? 'procedural'
+  return { signal, nowSeconds, trackKey, kind }
+}

@@ -89,6 +89,20 @@ export function getMixtapeDuration(): number {
   return typeof d === 'number' ? d : 0
 }
 
+// The visualizer needs the underlying <audio> element to attach a Web Audio
+// analyser. `html5: true` Howls keep it at _sounds[0]._node — a private but
+// long-stable Howler field. Returns null before the first load.
+export function getMediaElement(): HTMLMediaElement | null {
+  if (!howl) return null
+  const sounds = (howl as unknown as { _sounds?: Array<{ _node?: HTMLMediaElement }> })._sounds
+  const node = sounds?.[0]?._node
+  return node instanceof HTMLMediaElement ? node : null
+}
+
+export function getCurrentSlug(): string | null {
+  return currentSlug
+}
+
 export function disposeMixtape() {
   stopPoll()
   howl?.unload()
