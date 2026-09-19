@@ -11,6 +11,7 @@ export interface MixtapeTrack {
   movie: MixtapeMovie
   src: string
   cover?: string
+  spotifyId?: string
 }
 
 export const MIXTAPE_TRACKS: MixtapeTrack[] = [

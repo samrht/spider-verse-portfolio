@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "beatmaps": "node scripts/analyse-track.mjs public/audio/mixtape/*.mp3 --out public/beatmaps"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

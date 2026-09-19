@@ -6,6 +6,7 @@ import { createSignal, type SignalProvider } from './signal/types'
 import { Procedural } from './signal/Procedural'
 import { LiveFFT } from './signal/LiveFFT'
 import { selectProvider, type ProviderKind } from './signal/select'
+import { hasBeatMap, loadBeatMap, BeatMap } from './signal/BeatMap'
 
 // Owns the active SignalProvider for the page and samples it once per
 // animation frame into a single mutable AudioSignal (the canvas reads the
@@ -27,13 +28,15 @@ export function useSignal(inputs: SignalInputs = {}) {
   const progressRef = useRef(progress)
   useEffect(() => { progressRef.current = progress })
 
+  const beatMapFor = inputs.beatMapFor ?? hasBeatMap
+  const makeBeatMap = inputs.makeBeatMap ?? null
   const spotify = inputs.spotify ?? null
   const kind: ProviderKind = selectProvider({
     localPlaying: isPlaying,
     analyserAvailable: LiveFFT.available() && getMediaElement() !== null,
-    localHasBeatMap: inputs.beatMapFor?.(slug) ?? false,
+    localHasBeatMap: beatMapFor(slug),
     spotifyPlaying: !!spotify?.playing,
-    spotifyHasBeatMap: !!(spotify?.slug && inputs.beatMapFor?.(spotify.slug)),
+    spotifyHasBeatMap: !!(spotify?.slug && beatMapFor(spotify.slug)),
   })
 
   // Lazily stamped in an effect rather than a useRef initializer: reading
@@ -48,19 +51,36 @@ export function useSignal(inputs: SignalInputs = {}) {
 
   const [provider, setProvider] = useState<SignalProvider | null>(null)
   useEffect(() => {
-    let p: SignalProvider | null = null
-    if (kind === 'live') {
-      const el = getMediaElement()
-      if (el) p = new LiveFFT(el)
-    } else if (kind === 'beatmap') {
-      const s = isPlaying ? slug : spotify?.slug ?? slug
-      p = inputs.makeBeatMap?.(s, nowSeconds) ?? null
-    }
-    if (!p) p = new Procedural({ idle: kind === 'idle' })
     let cancelled = false
-    p.start().then(() => { if (!cancelled) setProvider(p) })
-    return () => { cancelled = true; p?.stop() }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let active: SignalProvider | null = null
+
+    // Single load path for every provider kind: resolve the right
+    // provider (awaiting a beat-map fetch when there's no injected
+    // `makeBeatMap`), start it, and only publish it if this effect run
+    // hasn't since been cancelled (deps changed or the component unmounted).
+    async function pick(): Promise<SignalProvider> {
+      if (kind === 'live') {
+        const el = getMediaElement()
+        if (el) return new LiveFFT(el)
+      } else if (kind === 'beatmap') {
+        const s = isPlaying ? slug : spotify?.slug ?? slug
+        const made = makeBeatMap?.(s, nowSeconds)
+        if (made) return made
+        const m = await loadBeatMap(s)
+        if (m) return new BeatMap(m, nowSeconds)
+      }
+      return new Procedural({ idle: kind === 'idle' })
+    }
+
+    pick().then(async (p) => {
+      await p.start()
+      if (cancelled) { p.stop(); return }
+      active = p
+      setProvider(p)
+    })
+
+    return () => { cancelled = true; active?.stop() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nowSeconds/makeBeatMap change only alongside kind/isPlaying/spotify?.slug here
   }, [kind, slug, isPlaying, spotify?.slug])
 
   useEffect(() => {
