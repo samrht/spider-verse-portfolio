@@ -64,8 +64,11 @@ export function useSignal(inputs: SignalInputs = {}) {
         if (el) return new LiveFFT(el)
       } else if (kind === 'beatmap') {
         const s = isPlaying ? slug : spotify?.slug ?? slug
-        const made = makeBeatMap?.(s, nowSeconds)
-        if (made) return made
+        // When `makeBeatMap` is supplied, its return value is final: a
+        // `null` means "no map for this track", not "fall through to the
+        // network fetch". Only the absence of the hook itself falls
+        // through to `loadBeatMap`.
+        if (makeBeatMap) return makeBeatMap(s, nowSeconds) ?? new Procedural()
         const m = await loadBeatMap(s)
         if (m) return new BeatMap(m, nowSeconds)
       }
