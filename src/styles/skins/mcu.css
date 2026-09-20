@@ -1,0 +1,23 @@
+/* MCU — cinematic. Near-black, letterbox, film grain, Stark HUD lines. */
+[data-universe="mcu"] {
+  --u-bg: #06090f;
+  --u-paper: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 2px, transparent 2px 4px);
+  --u-ink: #e6f1ff;
+  --u-accent: #7fb7ff;
+  --u-accent-2: #ff2d2d;
+  --u-font-display: 'Rajdhani', system-ui, sans-serif;
+  --u-font-body: 'Rajdhani', system-ui, sans-serif;
+  --u-panel-border: 1px solid #7fb7ff;
+  --u-panel-shadow: 0 0 40px rgba(127, 183, 255, 0.18);
+  --u-caption-bg: #0e1a2b;
+  --u-ease: cubic-bezier(0.45, 0, 0.55, 1);
+  --u-duration: 900ms;
+  --u-scanline: 1;
+
+  --universe-bg: #06090f;
+  --universe-primary: #7fb7ff;
+  --universe-accent: #ff2d2d;
+  --universe-text: #e6f1ff;
+  --universe-surface: rgba(127, 183, 255, 0.07);
+  --universe-glow: 0 0 40px rgba(127, 183, 255, 0.25);
+}

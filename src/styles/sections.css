@@ -9,7 +9,7 @@
 }
 
 /* Earth-1610 · graffiti / halftone ------------------------------------ */
-.decor-earth-1610 {
+.decor-verse {
   background-image:
     radial-gradient(circle at center, rgba(255, 45, 45, 0.16) 1px, transparent 1.5px),
     radial-gradient(circle at center, rgba(123, 47, 255, 0.08) 1px, transparent 1.5px);
@@ -20,7 +20,7 @@
 }
 
 /* Earth-65 · watercolor wash ----------------------------------------- */
-.decor-earth-65 {
+.decor-toon {
   background:
     radial-gradient(ellipse at 15% 20%, rgba(110, 198, 245, 0.28), transparent 55%),
     radial-gradient(ellipse at 85% 75%, rgba(245, 198, 208, 0.32), transparent 60%),
@@ -29,7 +29,7 @@
 }
 
 /* Earth-138 · punk grain + scanline noise --------------------------- */
-.decor-earth-138 {
+.decor-616 {
   background-image:
     repeating-linear-gradient(
       0deg,
@@ -46,8 +46,8 @@
       rgba(192, 57, 43, 0.05) 9px
     );
 }
-.decor-earth-138::before,
-.decor-earth-138::after {
+.decor-616::before,
+.decor-616::after {
   content: '';
   position: absolute;
   left: 0;
@@ -60,17 +60,17 @@
     79% 20%, 84% 75%, 89% 30%, 94% 70%, 100% 40%, 100% 100%, 0 100%
   );
 }
-.decor-earth-138::before { top: 0; transform: scaleY(-1); }
-.decor-earth-138::after  { bottom: 0; }
+.decor-616::before { top: 0; transform: scaleY(-1); }
+.decor-616::after  { bottom: 0; }
 
 /* Earth-928 · HUD grid + scan line ---------------------------------- */
-.decor-earth-928 {
+.decor-mcu {
   background-image:
     linear-gradient(to right, rgba(0, 212, 255, 0.07) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(0, 212, 255, 0.07) 1px, transparent 1px);
   background-size: 64px 64px;
 }
-.decor-earth-928::after {
+.decor-mcu::after {
   content: '';
   position: absolute;
   left: 0;

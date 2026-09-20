@@ -6,7 +6,7 @@
  *
  * Imported from Google Fonts for now; swap to /public/fonts self-hosting before ship. */
 
-@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Luckiest+Guy&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap');
 
 :root {
   --font-display: 'Bangers', cursive;

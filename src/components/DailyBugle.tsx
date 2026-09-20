@@ -34,7 +34,7 @@ function headlinesAsArticles(category: BugleCategory): BugleArticle[] {
 }
 
 // Fixed left-edge Bugle rail. Phase 2 changes from newsprint paper to a dark
-// Earth-1610 broadsheet — data-universe="earth-1610" forces the universe
+// Earth-1610 broadsheet — data-universe="verse" forces the universe
 // tokens locally even when the user is currently viewing another universe.
 // The masthead is the collapse affordance (not the whole aside) so the new
 // interactive tabs / cards / FULL EDITION button don't accidentally toggle
@@ -103,7 +103,7 @@ export function DailyBugle() {
       <aside
         ref={rootRef}
         className="daily-bugle"
-        data-universe="earth-1610"
+        data-universe="verse"
         data-collapsed
         onClick={toggleCollapse}
         aria-label="The Daily Bugle (collapsed — click to expand)"
@@ -119,7 +119,7 @@ export function DailyBugle() {
     <aside
       ref={rootRef}
       className="daily-bugle bugle-surface"
-      data-universe="earth-1610"
+      data-universe="verse"
       aria-label="The Daily Bugle"
     >
       <div className="bugle-inner">

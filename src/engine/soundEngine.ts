@@ -18,10 +18,10 @@ interface TrackDef {
 // existing format MUST be first or Howler gets stuck loading the missing
 // one and silently bails via onloaderror.
 const AMBIENT: Record<Universe, TrackDef> = {
-  'earth-1610': { src: ['/audio/ambient-1610.mp3', '/audio/ambient-1610.ogg'], volume: 0.28, loop: true, html5: true },
-  'earth-65':   { src: ['/audio/ambient-65.mp3',   '/audio/ambient-65.ogg'],   volume: 0.28, loop: true, html5: true },
-  'earth-138':  { src: ['/audio/ambient-138.mp3',  '/audio/ambient-138.ogg'],  volume: 0.32, loop: true, html5: true },
-  'earth-928':  { src: ['/audio/ambient-928.mp3',  '/audio/ambient-928.ogg'],  volume: 0.25, loop: true, html5: true },
+  verse:  { src: ['/audio/ambient-1610.mp3', '/audio/ambient-1610.ogg'], volume: 0.28, loop: true, html5: true },
+  toon:   { src: ['/audio/ambient-65.mp3',   '/audio/ambient-65.ogg'],   volume: 0.28, loop: true, html5: true },
+  '616':  { src: ['/audio/ambient-138.mp3',  '/audio/ambient-138.ogg'],  volume: 0.32, loop: true, html5: true },
+  mcu:    { src: ['/audio/ambient-928.mp3',  '/audio/ambient-928.ogg'],  volume: 0.25, loop: true, html5: true },
 }
 
 // Files-we-actually-have FIRST (.wav) then higher-fidelity placeholder slots

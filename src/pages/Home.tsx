@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
-import { Earth1610 } from '../sections/Earth1610'
-import { Earth65 } from '../sections/Earth65'
 import { Earth138 } from '../sections/Earth138'
 import { Earth928 } from '../sections/Earth928'
+import { Earth65 } from '../sections/Earth65'
+import { Earth1610 } from '../sections/Earth1610'
 import { LockedPortals } from '../sections/LockedPortals'
 import { useSuitStore } from '../store/suitStore'
 
@@ -44,7 +44,7 @@ const SuitHUD = lazy(() =>
 function SuitStandby() {
   const openSuit = useSuitStore((s) => s.openSuit)
   return (
-    <section className="suit-standby" data-universe="earth-928" aria-label="Spider-Suit HUD launchpad">
+    <section className="suit-standby" data-universe="mcu" aria-label="Spider-Suit HUD launchpad">
       <div className="suit-standby-emblem" aria-hidden="true">
         <span className="suit-standby-ring" />
         <span className="suit-standby-ring" />
@@ -176,10 +176,12 @@ export function Home() {
         </Suspense>
       )}
       <main>
-        <Earth1610 />
-        <Earth65 />
+        {/* Story order: comic origins (616) -> MCU flagship -> cartoon side
+         * quests (toon) -> Spider-Verse (verse), matching UNIVERSE_IDS. */}
         <Earth138 />
         <Earth928 />
+        <Earth65 />
+        <Earth1610 />
         <SuitStandby />
         <LockedPortals />
       </main>

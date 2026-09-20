@@ -17,10 +17,10 @@ const VERT = /* glsl */ `
 `
 
 const PRIMARY_RGB: Record<Universe, [number, number, number]> = {
-  'earth-1610': [1.0, 0.176, 0.176],   // #ff2d2d
-  'earth-65':   [0.431, 0.776, 0.961], // #6ec6f5
-  'earth-138':  [0.910, 0.831, 0.302], // #e8d44d
-  'earth-928':  [0.0, 0.831, 1.0],     // #00d4ff
+  verse: [1.0, 0.176, 0.420],   // #ff2d6b
+  toon:  [1.0, 0.231, 0.231],   // #ff3b3b
+  '616': [0.753, 0.224, 0.169], // #c0392b
+  mcu:   [0.498, 0.718, 1.0],   // #7fb7ff
 }
 
 let inFlight = false

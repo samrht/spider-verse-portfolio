@@ -5,16 +5,16 @@ import type { Universe } from '../../store/universeStore'
 // white for the third slot. Kept as constants (not read from CSS) so the
 // engine has no DOM dependency.
 const PRIMARY: Record<Universe, string> = {
-  'earth-1610': '#ff2d2d',
-  'earth-65': '#6ec6f5',
-  'earth-138': '#e8d44d',
-  'earth-928': '#00d4ff',
+  '616': '#c0392b',
+  mcu: '#7fb7ff',
+  toon: '#ff3b3b',
+  verse: '#ff2d6b',
 }
 const ACCENT: Record<Universe, string> = {
-  'earth-1610': '#7b2fff',
-  'earth-65': '#f5c6d0',
-  'earth-138': '#c0392b',
-  'earth-928': '#0057ff',
+  '616': '#ffd400',
+  mcu: '#ff2d2d',
+  toon: '#ffe14d',
+  verse: '#00e5ff',
 }
 
 export function paletteFor(u: Universe): [THREE.Color, THREE.Color, THREE.Color] {

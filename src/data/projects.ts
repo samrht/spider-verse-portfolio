@@ -20,7 +20,7 @@ export const projects: Project[] = [
     description:
       'Browser-based quantitative finance engine. Thousands of stochastic market paths run in Web Workers — VaR, CVaR, max drawdown, goal-feasibility probabilities. Replaces deterministic calculators with a probabilistic, risk-aware framework.',
     tags: ['TypeScript', 'Web Workers', 'Monte Carlo', 'Quant'],
-    universe: 'earth-1610',
+    universe: 'verse',
     link: 'https://montecarlo-risk-dashboard.vercel.app',
     repoLink: 'https://github.com/samrht/montecarlo-risk-dashboard',
     featured: true,
@@ -33,7 +33,7 @@ export const projects: Project[] = [
     description:
       'Multi-goal investment planner that translates spreadsheet math into "are you screwed or not" status. Inflation-adjusted FV, risk profiles, monthly SIP calculations — wrapped in a UI that doesn\'t make you feel stupid for asking.',
     tags: ['TypeScript', 'Product Design', 'Fintech', 'UI'],
-    universe: 'earth-65',
+    universe: 'toon',
     link: 'https://siplysmart.vercel.app',
     repoLink: 'https://github.com/samrht/SIPlySmart',
     featured: true,
@@ -46,7 +46,7 @@ export const projects: Project[] = [
     description:
       'A drop-in multifunctional Discord bot. Music (yt-dlp + FFmpeg), Blackjack with isolated per-user sessions, moderation, custom embedded help, modular cog architecture. Fork it. Tear it down. Build it better.',
     tags: ['Python', 'discord.py', 'OSS', 'Template'],
-    universe: 'earth-138',
+    universe: '616',
     repoLink: 'https://github.com/samrht/discord-bot-template',
     featured: true,
   },
@@ -58,7 +58,7 @@ export const projects: Project[] = [
     description:
       'The site you\'re on. Three.js ShaderMaterial halftone loader, GLSL glitch universe-transitions, GSAP elastic web-cursor, Lenis smooth scroll, four canon-accurate colour palettes. A dimensional event, not a page.',
     tags: ['React', 'Three.js', 'GLSL', 'GSAP'],
-    universe: 'earth-928',
+    universe: 'mcu',
     repoLink: 'https://github.com/samrht/spider-verse-portfolio',
     featured: true,
   },

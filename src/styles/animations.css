@@ -58,8 +58,8 @@
   .locked-title::before,
   .locked-title::after { display: none !important; }
 
-  /* Earth-928's scanline sweep — disable. */
-  .decor-earth-928::after { display: none !important; }
+  /* MCU's scanline sweep — disable. */
+  .decor-mcu::after { display: none !important; }
 
   /* The cursor still functions in reduced-motion (engine drops the elastic
    * lag), but kill its hover-grow transition. */

@@ -1,0 +1,23 @@
+/* Spider-Verse — Miles. Deep purple, CMYK misregistration, scanlines. */
+[data-universe="verse"] {
+  --u-bg: #12001f;
+  --u-paper: repeating-linear-gradient(90deg, transparent 0 18px, rgba(255, 45, 107, 0.10) 18px 20px);
+  --u-ink: #f0e6ff;
+  --u-accent: #ff2d6b;
+  --u-accent-2: #00e5ff;
+  --u-font-display: 'Bangers', cursive;
+  --u-font-body: 'Share Tech Mono', ui-monospace, monospace;
+  --u-panel-border: 3px solid #101010;
+  --u-panel-shadow: -3px 0 0 #00e5ff, 3px 0 0 #ff2d6b;
+  --u-caption-bg: #ff2d6b;
+  --u-ease: steps(5);
+  --u-duration: 400ms;
+  --u-scanline: 1;
+
+  --universe-bg: #12001f;
+  --universe-primary: #ff2d6b;
+  --universe-accent: #00e5ff;
+  --universe-text: #f0e6ff;
+  --universe-surface: rgba(255, 45, 107, 0.08);
+  --universe-glow: 0 0 40px rgba(255, 45, 107, 0.35);
+}

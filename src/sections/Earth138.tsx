@@ -3,10 +3,10 @@ import { ProjectCard } from '../components/ProjectCard'
 import { projects } from '../data/projects'
 
 export function Earth138() {
-  const list = projects.filter((p) => p.universe === 'earth-138')
+  const list = projects.filter((p) => p.universe === '616')
 
   return (
-    <UniverseShell universe="earth-138">
+    <UniverseShell universe="616">
       <div className="universe-content">
         <header className="universe-hero">
           <h2 className="font-display">Earth-138</h2>
@@ -21,7 +21,7 @@ export function Earth138() {
         </div>
       </div>
 
-      <div className="universe-decor decor-earth-138" aria-hidden />
+      <div className="universe-decor decor-616" aria-hidden />
     </UniverseShell>
   )
 }

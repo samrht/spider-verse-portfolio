@@ -19,10 +19,10 @@ export const SUIT_MODES: readonly SuitMode[] = [
 // --universe-* cascade does all colour work, the class drives HUD-only rules
 // (radar blip tints, etc).
 export const SUIT_MODE_UNIVERSE: Record<SuitMode, Universe> = {
-  earth1610: 'earth-1610',
-  earth65: 'earth-65',
-  earth138: 'earth-138',
-  earth928: 'earth-928',
+  earth1610: 'verse',
+  earth65: 'toon',
+  earth138: '616',
+  earth928: 'mcu',
 }
 
 export const SUIT_MODE_LABEL: Record<SuitMode, string> = {

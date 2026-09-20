@@ -23,11 +23,11 @@ const SECTION_SCOPE: Record<
   BugleCategory,
   { universe: string; token: 'primary' | 'accent' }
 > = {
-  technology:    { universe: 'earth-928',  token: 'primary' }, // cyan
-  sports:        { universe: 'earth-138',  token: 'primary' }, // yellow
-  politics:      { universe: 'earth-1610', token: 'primary' }, // red
-  science:       { universe: 'earth-65',   token: 'primary' }, // blue
-  entertainment: { universe: 'earth-65',   token: 'accent'  }, // pink
+  technology:    { universe: 'mcu',   token: 'primary' }, // cyan
+  sports:        { universe: '616',   token: 'primary' }, // yellow
+  politics:      { universe: 'verse', token: 'primary' }, // red
+  science:       { universe: 'toon',  token: 'primary' }, // blue
+  entertainment: { universe: 'toon',  token: 'accent'  }, // pink
 }
 
 // Real broadsheets number issues by day-of-year. "Vol. 312" is a static
@@ -223,7 +223,7 @@ export function Bugle() {
   }, [setCategory])
 
   return (
-    <main className="bugle-page bugle-surface" data-universe="earth-1610">
+    <main className="bugle-page bugle-surface" data-universe="verse">
       <header className="bugle-page-masthead">
         <h1>THE DAILY BUGLE</h1>
         <p className="bugle-page-tagline">NEW YORK'S FINEST NEWS SOURCE</p>

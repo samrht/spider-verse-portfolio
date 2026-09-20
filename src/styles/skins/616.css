@@ -1,0 +1,24 @@
+/* Earth-616 — printed comic. Yellowed paper, Ben-Day dots, hard ink. */
+:root,
+[data-universe="616"] {
+  --u-bg: #f4e8c8;
+  --u-paper: radial-gradient(circle, rgba(192, 57, 43, 0.45) 1.1px, transparent 1.3px) 0 0 / 7px 7px;
+  --u-ink: #1b1b1b;
+  --u-accent: #c0392b;
+  --u-accent-2: #ffd400;
+  --u-font-display: 'Bangers', cursive;
+  --u-font-body: 'Share Tech Mono', ui-monospace, monospace;
+  --u-panel-border: 4px solid #101010;
+  --u-panel-shadow: 8px 8px 0 #000;
+  --u-caption-bg: #ffd400;
+  --u-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --u-duration: 300ms;
+  --u-scanline: 0;
+
+  --universe-bg: #f4e8c8;
+  --universe-primary: #c0392b;
+  --universe-accent: #ffd400;
+  --universe-text: #1b1b1b;
+  --universe-surface: rgba(27, 27, 27, 0.06);
+  --universe-glow: 0 0 0 transparent;
+}

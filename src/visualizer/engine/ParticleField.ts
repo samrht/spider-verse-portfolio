@@ -52,7 +52,7 @@ export class ParticleField {
       uTime: { value: 0 },
       uPointScale: { value: 6 },
       uBreath: { value: reducedMotion ? 0.125 : 0.25 },
-      uPalette: { value: paletteFor('earth-1610') },
+      uPalette: { value: paletteFor('verse') },
     }
     this.material = new THREE.ShaderMaterial({
       vertexShader: vert,

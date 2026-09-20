@@ -1,13 +1,9 @@
 import { create } from 'zustand'
 
-export type Universe = 'earth-1610' | 'earth-65' | 'earth-138' | 'earth-928'
+export type Universe = '616' | 'mcu' | 'toon' | 'verse'
 
-export const UNIVERSE_IDS: readonly Universe[] = [
-  'earth-1610',
-  'earth-65',
-  'earth-138',
-  'earth-928',
-]
+// Story order: comic origins → MCU flagship → cartoon side quests → Spider-Verse.
+export const UNIVERSE_IDS: readonly Universe[] = ['616', 'mcu', 'toon', 'verse']
 
 interface UniverseState {
   activeUniverse: Universe
@@ -21,7 +17,7 @@ interface UniverseState {
 const TRANSITION_MS = 800
 
 export const useUniverseStore = create<UniverseState>()((set, get) => ({
-  activeUniverse: 'earth-1610',
+  activeUniverse: '616',
   isTransitioning: false,
   symbioteMode: false,
 

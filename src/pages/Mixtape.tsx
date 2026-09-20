@@ -34,14 +34,14 @@ export function Mixtape() {
     // step with the page's forced earth-1610 palette, not just the DOM
     // attribute — setUniverse updates both.
     const prev = useUniverseStore.getState().activeUniverse
-    useUniverseStore.getState().setUniverse('earth-1610')
+    useUniverseStore.getState().setUniverse('verse')
     return () => {
       useUniverseStore.getState().setUniverse(prev)
     }
   }, [])
 
   return (
-    <main className={`viz-page ${deckHidden ? 'is-deck-hidden' : ''}`} data-universe="earth-1610">
+    <main className={`viz-page ${deckHidden ? 'is-deck-hidden' : ''}`} data-universe="verse">
       {fallback ? (
         <div className="viz-fallback" data-testid="viz-fallback" aria-hidden="true">
           <div className="mixtape-cover">

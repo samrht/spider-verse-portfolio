@@ -4,11 +4,11 @@ import { projects } from '../data/projects'
 import { useSuitStore } from '../store/suitStore'
 
 export function Earth928() {
-  const list = projects.filter((p) => p.universe === 'earth-928')
+  const list = projects.filter((p) => p.universe === 'mcu')
   const openSuit = useSuitStore((s) => s.openSuit)
 
   return (
-    <UniverseShell universe="earth-928">
+    <UniverseShell universe="mcu">
       <div className="universe-content">
         <header className="universe-hero">
           <h2 className="font-display">Earth-928</h2>
@@ -36,7 +36,7 @@ export function Earth928() {
         </button>
       </div>
 
-      <div className="universe-decor decor-earth-928" aria-hidden />
+      <div className="universe-decor decor-mcu" aria-hidden />
     </UniverseShell>
   )
 }

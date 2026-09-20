@@ -1,0 +1,10 @@
+/* Skin contract — every skins/<id>.css MUST define all of these inside
+ * [data-universe="<id>"]. Consumers use ONLY these variables.
+ *   --u-bg  --u-paper  --u-ink  --u-accent  --u-accent-2
+ *   --u-font-display  --u-font-body
+ *   --u-panel-border  --u-panel-shadow  --u-caption-bg
+ *   --u-ease  --u-duration  --u-scanline
+ * Legacy aliases (kept so Bugle/Suit/cursor/mixtape keep working):
+ *   --universe-bg  --universe-primary  --universe-accent  --universe-text
+ *   --universe-surface  --universe-glow
+ * :root falls back to the 616 skin (see 616.css). */
