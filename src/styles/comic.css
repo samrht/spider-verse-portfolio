@@ -60,3 +60,42 @@
 @media (max-width: 767px) {
   .comic-panel { margin: 0 12px; }
 }
+
+/* — Splash — */
+.comic-panel.splash { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: 'still body'; }
+.comic-panel.splash-still-right { grid-template-areas: 'body still'; }
+.splash-still { grid-area: still; position: relative; overflow: hidden; border-right: var(--u-panel-border); }
+.splash-still-right .splash-still { border-right: 0; border-left: var(--u-panel-border); }
+.splash-still .comic-still { transform: scale(1.12); will-change: transform; }
+.splash-body { grid-area: body; padding: clamp(24px, 6vw, 72px); display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+.comic-kicker { margin: 0; font: 700 12px/1 var(--u-font-body); letter-spacing: .2em; opacity: .75; }
+.comic-title { margin: 0; font: 900 clamp(44px, 7vw, 104px)/.95 var(--u-font-display); letter-spacing: .02em; text-shadow: 4px 4px 0 var(--u-accent-2); }
+[data-universe="mcu"] .comic-title { text-shadow: none; letter-spacing: .12em; font-weight: 600; }
+[data-universe="verse"] .comic-title { text-shadow: -3px 0 var(--u-accent-2), 3px 0 var(--u-accent); transform: rotate(-2deg); }
+.comic-tagline { margin: 0; font-size: clamp(16px, 1.6vw, 22px); line-height: 1.4; max-width: 46ch; }
+.splash-focus { margin-top: 8px; max-width: 60ch; }
+.splash-focus p { margin: 0 0 8px; line-height: 1.5; }
+.splash-links a { margin-right: 14px; color: var(--u-accent); font-weight: 700; }
+.splash-rest { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.splash-rest li { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--u-ink); padding: 4px 0; font-size: 14px; }
+.splash-rest a { color: inherit; font-weight: 700; text-decoration: none; }
+.splash-rest span { opacity: .6; font-size: 11px; letter-spacing: .1em; }
+.splash-caption { position: absolute; left: 24px; bottom: 24px; }
+
+/* — Grid — */
+.comic-panel.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; padding: clamp(24px, 5vw, 64px); }
+.grid-still { grid-column: span 5; aspect-ratio: 4 / 3; border: var(--u-panel-border); box-shadow: var(--u-panel-shadow); overflow: hidden; }
+.grid-head { grid-column: span 7; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+.grid-frames { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 0; padding: 0; list-style: none; }
+.grid-frame { position: relative; }
+.grid-frame .comic-sfx { position: absolute; right: -10px; top: -28px; z-index: 2; }
+
+@media (max-width: 767px) {
+  .comic-panel.splash, .comic-panel.splash-still-right { grid-template-columns: 1fr; grid-template-areas: 'still' 'body'; }
+  .splash-still { aspect-ratio: 16 / 9; border-right: 0; border-bottom: var(--u-panel-border); }
+  .splash-still-right .splash-still { border-left: 0; }
+  .splash-still .comic-still { transform: none; }
+  .grid-still, .grid-head, .grid-frames { grid-column: 1 / -1; }
+  .grid-frames { grid-template-columns: 1fr; }
+  .splash-caption { position: static; margin: 0 24px 24px; }
+}
