@@ -37,6 +37,7 @@ interface MixtapeState {
   setVolume: (v: number) => void
   seek: (s: number) => void
   setDeckHidden: (v: boolean) => void
+  playTrackAt: (slug: string, seconds: number) => void
 }
 
 const STORAGE_KEY = 'spv-mixtape'
@@ -235,6 +236,21 @@ export const useMixtapeStore = create<MixtapeState>()((set, get) => ({
   },
 
   setDeckHidden: (v) => set({ deckHidden: v }),
+
+  // Listen-along: start a local track at a given position (Spotify sync).
+  playTrackAt: (slug, seconds) => {
+    const index = MIXTAPE_TRACKS.findIndex((t) => t.slug === slug)
+    if (index < 0) return
+    get().select(index)
+    // Howler seeks after load; onLoad fires once, so defer the seek to it.
+    const unsub = useMixtapeStore.subscribe((s, prev) => {
+      if (s.duration > 0 && prev.duration === 0) {
+        seekMixtape(Math.min(seconds, s.duration - 1))
+        useMixtapeStore.setState({ progress: seconds })
+        unsub()
+      }
+    })
+  },
 }))
 
 // Wire engine callbacks once at module load.

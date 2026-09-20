@@ -86,3 +86,24 @@
   .viz-deck-transport { flex: 1 1 100%; justify-content: space-between; }
   .viz-deck-transport .mixtape-volume { display: none; }
 }
+
+.viz-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px; border-radius: 3px;
+  background: rgba(10, 10, 14, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font: 11px/1.25 'Share Tech Mono', ui-monospace, monospace;
+  color: #ddd; max-width: 320px;
+}
+.viz-chip.is-offline { color: #f88; }
+.viz-chip-art { border-radius: 2px; flex: none; }
+.viz-chip-text { display: flex; flex-direction: column; min-width: 0; }
+.viz-chip-label { color: #1db954; font-size: 9px; letter-spacing: 0.08em; }
+.viz-chip.is-idle .viz-chip-label { color: #999; }
+.viz-chip-track { font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.viz-chip-artist { opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.viz-chip-listen {
+  flex: none; background: var(--universe-primary, #ff2d2d); color: #fff; border: 0;
+  padding: 5px 8px; border-radius: 2px; font: inherit; font-weight: 700; cursor: pointer;
+}
+@media (max-width: 767px) { .viz-chip-text { display: none; } .viz-chip { max-width: none; } }
