@@ -52,7 +52,7 @@ Fixed chrome (outside the page flow, re-themed per universe — §5): Bugle side
 Content is data, not JSX. Adding a project or a still is one entry.
 
 - `src/data/universes.ts` — `Universe[]` (exactly four): `{ id, chapter: { number, kicker, title, tagline }, layout: 'splash' | 'grid', stillId, caption, sfx, itemSlugs: string[] }`.
-- `src/data/projects.ts` — grows from 4 entries to the real project list; each gets `universe: UniverseId`. Existing fields (`title`, `blurb`, `tags`, `href`) stay. `itemSlugs` in a universe must all exist here.
+- `src/data/projects.ts` — grows from 4 entries to the full project list seeded from the owner's vault (`Documentsault	uff vault\Projects`): DRISHTI, Idea Lab, Execution OS, Research Agent, Founder Discovery, Kerr black hole sim, Monte Carlo risk dashboard, SIPly Smart, Ledger investment lab, Personal investing assistant, Algo trading starter, Living Task Canvas, Productivity dashboard, Discord bot template, transcript tool, Claude design system, and this portfolio itself — **every vault project except the Sneha portfolio site**. Each gets `universe: UniverseId` per the chapter rule (`mcu` = flagship/deployed, `toon` = experiments/side quests, `verse` = everything else; `616` holds the bio, no projects). Existing fields (`title`, `blurb`, `tags`, `href`) stay; `href` may be a GitHub URL, a live URL, or absent (local-only projects render without a link). `itemSlugs` in a universe must all exist here.
 - `src/data/stills.ts` — the still manifest: `{ id, universeId, src: '/stills/<universe>/<file>.jpg', alt, credit: { title, owner } }`. Every still has a credit.
 - `src/data/cover.ts` — `{ masthead: 'THE AMAZING SMARTH', issue, price, stillId, coverLines: [{ universeId, text }] }`.
 - `src/store/universeStore.ts` — `Universe` type becomes `'616' | 'mcu' | 'toon' | 'verse'`; `setUniverse` unchanged (still sets `data-universe` on `<html>`); `symbioteMode` stays.
@@ -107,7 +107,7 @@ Removed: `sections/Earth1610|65|138|928.tsx`, `sections/LockedPortals.tsx`, `com
 
 ## 8. Assets
 
-- Stills: `public/stills/<universe>/<name>.jpg`, ≤ 200 KB each, sized for 1600 px wide max, plus a `-thumb.jpg` (400 px) for `PageIndex`. `loading="lazy"` except the cover still and panel 1. Sourced by the owner (official stills/posters); the manifest in `data/stills.ts` is the only place they're referenced.
+- Stills: `public/stills/<universe>/<name>.jpg`, ≤ 200 KB each, sized for 1600 px wide max, plus a `-thumb.jpg` (400 px) for `PageIndex`. `loading="lazy"` except the cover still and panel 1. Candidates are sourced by the implementer from the web (official stills/posters/promo art per franchise: 616 comic art, MCU film stills, '94/Spectacular/Ultimate cartoon frames, Into/Across the Spider-Verse frames; plus one cover image), saved under `public/stills/_candidates/<universe>/` with a `sources.md` listing origin URLs, and presented to the owner for approval; approved files are moved into place and the rest deleted before merge. The manifest in `data/stills.ts` is the only place stills are referenced.
 - Fan-site posture: every still credited in `NextIssue`; the credits paragraph carries the same "personal portfolio, not affiliated, contact for removal" wording as the mixtape.
 - Missing/failed image → the universe's paper texture with the sfx word, never a broken image (`onError` swap).
 - Lighthouse desktop on `/` stays ≥ 90; stills are the main risk — lazy loading and the size cap are hard requirements.
