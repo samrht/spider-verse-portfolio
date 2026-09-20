@@ -9,6 +9,7 @@ import {
   setMixtapeCallbacks,
   setMixtapeVolume,
   getMixtapeDuration,
+  getCurrentSlug,
 } from '../engine/mixtapeEngine'
 import { useAudioStore } from './audioStore'
 import { useUniverseStore } from './universeStore'
@@ -241,6 +242,20 @@ export const useMixtapeStore = create<MixtapeState>()((set, get) => ({
   playTrackAt: (slug, seconds) => {
     const index = MIXTAPE_TRACKS.findIndex((t) => t.slug === slug)
     if (index < 0) return
+
+    // loadMixtapeTrack short-circuits when the same slug is already loaded
+    // (no new Howl, so onLoad never fires again) — if the deck is already on
+    // this track, seek immediately instead of waiting on a duration flip
+    // that will never happen. R11.
+    const engineDuration = getMixtapeDuration()
+    if (getCurrentSlug() === slug && engineDuration > 0) {
+      get().play() // no-op if already playing
+      const clamped = Math.min(seconds, engineDuration - 1)
+      seekMixtape(clamped)
+      set({ progress: clamped })
+      return
+    }
+
     get().select(index)
     // Howler seeks after load; onLoad fires once, so defer the seek to it.
     const unsub = useMixtapeStore.subscribe((s, prev) => {
