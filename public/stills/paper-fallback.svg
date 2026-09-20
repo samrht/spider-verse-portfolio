@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <pattern id="ben-day-dots" patternUnits="userSpaceOnUse" width="20" height="20">
+      <circle cx="10" cy="10" r="3" fill="#1b1b1b" opacity="0.15"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="#f4e8c8"/>
+  <rect width="1600" height="900" fill="url(#ben-day-dots)"/>
+  <text x="800" y="470" font-family="Impact, sans-serif" font-size="120" font-weight="bold" text-anchor="middle" fill="#1b1b1b">STILL PENDING</text>
+</svg>
