@@ -6,6 +6,7 @@ import type { Universe } from '../../store/universeStore'
 import { MorphMachine, type TargetName } from './morph'
 import { bakeTarget } from '../targets'
 import { paletteFor } from './palette'
+import { MonotonicClock } from './clock'
 
 // Owns the Three objects for the field. No React, no DOM: VisualizerCanvas
 // mounts `points` and calls update() from useFrame. Attributes are baked
@@ -33,6 +34,9 @@ export class ParticleField {
   }
   private reduced = false
   private sm = { bass: 0, mids: 0, highs: 0 }
+  // R13: the morph machine is clocked from accumulated frame dt, never from
+  // playback position (which stays the BeatMap lookup key in useSignal).
+  private readonly clock = new MonotonicClock()
 
   constructor(n: number, seed = 1, reducedMotion = false) {
     this.n = n
@@ -85,11 +89,11 @@ export class ParticleField {
     this.u.uBreath.value = v ? 0.125 : 0.25
   }
 
-  onTrackStart(nowS: number): void {
-    this.morph.onTrackStart(nowS)
+  onTrackStart(): void {
+    this.morph.onTrackStart(this.clock.now)
   }
 
-  private startMorph(from: TargetName, to: TargetName): void {
+  private startMorph(to: TargetName): void {
     // Freeze the current blended pose as the new A so a mid-transition
     // retarget never snaps.
     const a = this.geometry.getAttribute('aTargetA') as THREE.BufferAttribute
@@ -98,17 +102,17 @@ export class ParticleField {
     const arr = a.array as Float32Array
     const brr = b.array as Float32Array
     for (let i = 0; i < arr.length; i++) arr[i] = arr[i] + (brr[i] - arr[i]) * t
-    void from
     brr.set(bakeTarget(to, this.n, this.seed))
     a.needsUpdate = true
     b.needsUpdate = true
     this.u.uMorph.value = 0
   }
 
-  update(sig: AudioSignal, nowS: number, dt: number): void {
+  update(sig: AudioSignal, dt: number): void {
+    const nowS = this.clock.tick(dt)
     this.morph.onSection(sig.section.index, sig.section.energy, nowS)
     const ev = this.morph.update(nowS)
-    if (ev) this.startMorph(ev.from, ev.to)
+    if (ev) this.startMorph(ev.to)
     this.u.uMorph.value = this.morph.progress
 
     this.sm.bass += (sig.bass - this.sm.bass) * (sig.bass > this.sm.bass ? SMOOTH.attack : SMOOTH.release)

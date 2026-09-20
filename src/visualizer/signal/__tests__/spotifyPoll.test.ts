@@ -36,6 +36,38 @@ describe('useSpotifyStore polling', () => {
     expect(f).toHaveBeenCalledTimes(2)
   })
 
+  // R15: the interpolated position must include the response's CDN age,
+  // so lastFetchedAt is the SERVER stamp when it is plausible ...
+  it('interpolates from the server fetchedAt (includes response age)', async () => {
+    const now = Date.now()
+    const payload = { isPlaying: true, spotifyId: 'x', track: 't', artist: 'a', album: 'b', art: null, progressMs: 10_000, durationMs: 100_000, fetchedAt: now - 2500 }
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify(payload)))
+    const stop = useSpotifyStore.getState().start()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(useSpotifyStore.getState().lastFetchedAt).toBe(now - 2500)
+    expect(useSpotifyStore.getState().positionMs()).toBeCloseTo(12_500, -1)
+    stop()
+  })
+
+  // ... and falls back to the local clock when it is not (visitor clock skew).
+  it('falls back to the local stamp when the server fetchedAt is implausible', async () => {
+    const now = Date.now()
+    const payload = { isPlaying: true, spotifyId: 'x', track: 't', artist: 'a', album: 'b', art: null, progressMs: 10_000, durationMs: 100_000, fetchedAt: now - 999_999 }
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify(payload)))
+    const stop = useSpotifyStore.getState().start()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(useSpotifyStore.getState().lastFetchedAt).toBe(Date.now())
+    expect(useSpotifyStore.getState().positionMs()).toBeCloseTo(10_000, -1)
+    stop()
+    // A stamp from the future (skew the other way) also falls back.
+    const future = { ...payload, fetchedAt: Date.now() + 5000 }
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify(future)))
+    const stop2 = useSpotifyStore.getState().start()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(useSpotifyStore.getState().lastFetchedAt).toBe(Date.now())
+    stop2()
+  })
+
   it('goes offline on error payload or network failure', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ error: 'unavailable' })))
     const stop = useSpotifyStore.getState().start()

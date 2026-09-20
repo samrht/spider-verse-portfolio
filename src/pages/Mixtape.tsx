@@ -23,7 +23,7 @@ export function Mixtape() {
     () => ({ playing: spotifyStatus === 'playing', slug: spotifySlug, position: () => positionMs() / 1000 }),
     [spotifyStatus, spotifySlug, positionMs],
   )
-  const { signal, nowSeconds, trackKey, kind } = useSignal({ spotify })
+  const { signal, trackKey, kind } = useSignal({ spotify })
   const deckHidden = useMixtapeStore((s) => s.deckHidden)
   const debug = new URLSearchParams(window.location.search).has('debug')
   const [fallback, setFallback] = useState(false)
@@ -52,7 +52,7 @@ export function Mixtape() {
           </div>
         </div>
       ) : (
-        <VisualizerCanvas signal={signal} nowSeconds={nowSeconds} trackKey={trackKey} debug={debug} onFallback={onFallback} />
+        <VisualizerCanvas signal={signal} trackKey={trackKey} debug={debug} onFallback={onFallback} />
       )}
       <Link to="/" className="mixtape-page-back viz-back">← BACK TO MOTHERSHIP</Link>
       <div className="viz-topright">

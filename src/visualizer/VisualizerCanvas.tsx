@@ -11,7 +11,6 @@ import { nextOver } from './frameGuard'
 
 export interface VisualizerCanvasProps {
   signal: AudioSignal          // mutated in place by the active provider
-  nowSeconds: () => number     // playback position or wall clock
   trackKey: string             // changes → onTrackStart
   debug?: boolean
   onFallback?: () => void      // WebGL unavailable / shader failed
@@ -23,13 +22,17 @@ function hasWebGL(): boolean {
   if (typeof WebGLRenderingContext === 'undefined') return false
   try {
     const c = document.createElement('canvas')
-    return !!(c.getContext('webgl2') || c.getContext('webgl'))
+    const ctx = c.getContext('webgl2') || c.getContext('webgl')
+    if (!ctx) return false
+    // Release the probe context: browsers cap live WebGL contexts per page.
+    ctx.getExtension('WEBGL_lose_context')?.loseContext()
+    return true
   } catch {
     return false
   }
 }
 
-function Field({ signal, nowSeconds, trackKey, debug }: VisualizerCanvasProps) {
+function Field({ signal, trackKey, debug }: VisualizerCanvasProps) {
   const gl = useThree((s) => s.gl)
   const n = useMemo(
     () =>
@@ -48,11 +51,13 @@ function Field({ signal, nowSeconds, trackKey, debug }: VisualizerCanvasProps) {
 
   useEffect(() => field.setPalette(universe), [field, universe])
   useEffect(() => onReducedMotionChange((r) => field.setReducedMotion(r)), [field])
-  useEffect(() => { field.onTrackStart(nowSeconds()) }, [field, trackKey, nowSeconds])
+  // R14: only a real track change replays the emblem (the field keeps its
+  // own monotonic clock, so no time argument is needed).
+  useEffect(() => { field.onTrackStart() }, [field, trackKey])
   useEffect(() => () => field.dispose(), [field])
 
   useFrame((_, dt) => {
-    field.update(signal, nowSeconds(), dt)
+    field.update(signal, dt)
     // spec §7: > 24 ms for 2 s → halve N once. A backgrounded tab can
     // resume with a multi-second dt; frameGuard's nextOver treats that as
     // a stall and resets rather than accumulating.
@@ -114,13 +119,15 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 export function VisualizerCanvas(props: VisualizerCanvasProps) {
   const [failed, setFailed] = useState(() => !hasWebGL())
   const reported = useRef(false)
+  const onFallback = useRef(props.onFallback)
+  useEffect(() => { onFallback.current = props.onFallback })
 
   useEffect(() => {
     if (failed && !reported.current) {
       reported.current = true
-      props.onFallback?.()
+      onFallback.current?.()
     }
-  }, [failed, props])
+  }, [failed])
 
   if (failed) return null
 

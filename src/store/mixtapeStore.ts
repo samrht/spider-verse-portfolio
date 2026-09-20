@@ -258,10 +258,16 @@ export const useMixtapeStore = create<MixtapeState>()((set, get) => ({
 
     get().select(index)
     // Howler seeks after load; onLoad fires once, so defer the seek to it.
-    const unsub = useMixtapeStore.subscribe((s, prev) => {
+    // A load that never reports a duration (network error, bad file) must
+    // not leak the subscriber: give up after 10 s.
+    let unsub: () => void = () => {}
+    const timeout = window.setTimeout(() => unsub(), 10_000)
+    unsub = useMixtapeStore.subscribe((s, prev) => {
       if (s.duration > 0 && prev.duration === 0) {
-        seekMixtape(Math.min(seconds, s.duration - 1))
-        useMixtapeStore.setState({ progress: seconds })
+        const clamped = Math.min(seconds, s.duration - 1)
+        seekMixtape(clamped)
+        useMixtapeStore.setState({ progress: clamped })
+        window.clearTimeout(timeout)
         unsub()
       }
     })

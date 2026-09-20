@@ -73,4 +73,47 @@ describe('mixtapeStore.playTrackAt', () => {
 
     expect(engine.seekMixtape).toHaveBeenCalledWith(30)
   })
+
+  it('clamps the deferred seek and writes the clamped progress', () => {
+    vi.mocked(engine.getCurrentSlug).mockReturnValue(null)
+    vi.mocked(engine.getMixtapeDuration).mockReturnValue(0)
+
+    useMixtapeStore.getState().playTrackAt(otherSlug, 500)
+    useMixtapeStore.setState({ duration: 200 })
+
+    expect(engine.seekMixtape).toHaveBeenCalledWith(199)
+    expect(useMixtapeStore.getState().progress).toBe(199)
+  })
+
+  it('drops the deferred-seek subscriber after 10 s when the load never reports a duration', () => {
+    vi.useFakeTimers()
+    try {
+      vi.mocked(engine.getCurrentSlug).mockReturnValue(null)
+      vi.mocked(engine.getMixtapeDuration).mockReturnValue(0)
+
+      useMixtapeStore.getState().playTrackAt(otherSlug, 30)
+      vi.advanceTimersByTime(10_000)
+
+      // A duration flip after the timeout must not trigger the stale seek.
+      useMixtapeStore.setState({ duration: 200 })
+      expect(engine.seekMixtape).not.toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('clears the timeout once the deferred seek fires', () => {
+    vi.useFakeTimers()
+    try {
+      vi.mocked(engine.getCurrentSlug).mockReturnValue(null)
+      vi.mocked(engine.getMixtapeDuration).mockReturnValue(0)
+
+      useMixtapeStore.getState().playTrackAt(otherSlug, 30)
+      useMixtapeStore.setState({ duration: 200 })
+      expect(engine.seekMixtape).toHaveBeenCalledTimes(1)
+      expect(vi.getTimerCount()).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })

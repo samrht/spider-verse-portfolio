@@ -62,9 +62,13 @@ export const useSpotifyStore = create<SpotifyState>()((set, get) => ({
           | ({ isPlaying: true; fetchedAt: number } & NowPlayingClient)
           | { isPlaying: false; lastPlayed: NowPlayingClient | null; fetchedAt: number }
         if ('error' in j) { set({ status: 'offline' }); schedule(); return }
-        // Use our own clock as fetchedAt: the server's clock may drift and
-        // the interpolation only needs local elapsed time.
-        const fetchedAt = Date.now()
+        // R15: interpolate from the server's fetchedAt so the response's
+        // CDN age (0-3 s, up to 13 s under stale-while-revalidate) counts
+        // toward the position. Fall back to our own clock when the server
+        // stamp is implausible (visitor clock skew).
+        const localNow = Date.now()
+        const serverAge = localNow - j.fetchedAt
+        const fetchedAt = serverAge >= 0 && serverAge <= 60_000 ? j.fetchedAt : localNow
         if (j.isPlaying) {
           const { isPlaying: _p, fetchedAt: _f, ...track } = j
           set({ status: 'playing', now: track, lastFetchedAt: fetchedAt, slug: slugForSpotifyId(track.spotifyId) })

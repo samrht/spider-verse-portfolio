@@ -25,14 +25,13 @@ function defaultCtx(): AudioContext {
 
 export class LiveFFT implements SignalProvider {
   readonly mode = 'live' as const
-  private ctx: AudioContext | null = null
   private source: MediaElementAudioSourceNode | null = null
   private analyser: AnalyserNode | null = null
   private bins = new Uint8Array(512)
   private ranges = { bass: [0, 1] as [number, number], mids: [0, 1] as [number, number], highs: [0, 1] as [number, number] }
   private onset = new OnsetDetector()
   private sections = new SectionDetector()
-  private lastT = 0
+  private lastPerf = 0
   private sm = { bass: 0, mids: 0, highs: 0, energy: 0 }
   private readonly el: HTMLMediaElement
   private readonly ctxFactory: () => AudioContext
@@ -47,30 +46,48 @@ export class LiveFFT implements SignalProvider {
     return typeof window !== 'undefined' && !!(window.AudioContext || (window as unknown as { webkitAudioContext?: unknown }).webkitAudioContext)
   }
 
+  // R16: resume the context BEFORE touching the element. createMediaElementSource
+  // permanently reroutes the element through this context; if the context can't
+  // run (Safari outside transient activation, iOS interruption) doing that
+  // would mute the mixtape page-wide. Rejecting here lets useSignal fall
+  // through to BeatMap/Procedural with the element's native output intact.
   async start(): Promise<void> {
     if (this.analyser) return
-    this.ctx = this.ctxFactory()
+    const ctx = this.ctxFactory()
+    await ctx.resume().catch(() => {})
+    if (ctx.state !== 'running') throw new Error('AudioContext not running')
     let source = sources.get(this.el)
     if (!source) {
-      source = this.ctx.createMediaElementSource(this.el)
+      source = ctx.createMediaElementSource(this.el)
       // Permanent: this is the element's only remaining path to speakers.
-      source.connect(this.ctx.destination)
+      source.connect(ctx.destination)
       sources.set(this.el, source)
     }
     this.source = source
-    const analyser = this.ctx.createAnalyser()
+    const analyser = ctx.createAnalyser()
     analyser.fftSize = 1024
     analyser.smoothingTimeConstant = 0.6
     source.connect(analyser)
     this.analyser = analyser
     this.bins = new Uint8Array(analyser.frequencyBinCount)
-    const sr = this.ctx.sampleRate
+    const sr = ctx.sampleRate
     this.ranges = {
       bass: binRange(sr, 1024, BAND_HZ.bass[0], BAND_HZ.bass[1]),
       mids: binRange(sr, 1024, BAND_HZ.mids[0], BAND_HZ.mids[1]),
       highs: binRange(sr, 1024, BAND_HZ.highs[0], BAND_HZ.highs[1]),
     }
-    if (this.ctx.state === 'suspended') await this.ctx.resume().catch(() => {})
+    this.lastPerf = 0
+  }
+
+  // Subscribe to the shared context's state changes (R16: useSignal re-runs
+  // provider selection when it flips back to 'running'). No-op until the
+  // context exists — creating it here, outside a gesture, would only earn a
+  // "not allowed to start" warning.
+  static onStateChange(cb: (state: AudioContextState) => void, ctx: AudioContext | null = sharedCtx): () => void {
+    if (!ctx) return () => {}
+    const handler = () => cb(ctx.state)
+    ctx.addEventListener('statechange', handler)
+    return () => ctx.removeEventListener('statechange', handler)
   }
 
   stop(): void {
@@ -81,15 +98,14 @@ export class LiveFFT implements SignalProvider {
     this.sections.reset()
   }
 
-  resetSections(): void {
-    this.sections.reset()
-  }
-
-  sample(out: AudioSignal, nowSeconds: number): void {
+  sample(out: AudioSignal, _nowSeconds: number): void {
     out.mode = 'live'
     if (!this.analyser) return
-    const dt = Math.max(0, Math.min(0.1, nowSeconds - this.lastT))
-    this.lastT = nowSeconds
+    // R13: onset/section timers run on wall-clock dt between samples, not on
+    // playback position (which only changes on the 250 ms progress poll).
+    const t = performance.now()
+    const dt = this.lastPerf ? Math.max(1 / 240, Math.min(0.1, (t - this.lastPerf) / 1000)) : 1 / 60
+    this.lastPerf = t
     this.analyser.getByteFrequencyData(this.bins)
 
     const bass = bandAverage(this.bins, this.ranges.bass[0], this.ranges.bass[1])
@@ -105,7 +121,7 @@ export class LiveFFT implements SignalProvider {
     out.mids = this.sm.mids
     out.highs = this.sm.highs
     out.energy = this.sm.energy
-    out.beat = this.onset.push(this.bins, dt || 1 / 60)
-    out.section = this.sections.push(loud, dt || 1 / 60)
+    out.beat = this.onset.push(this.bins, dt)
+    out.section = this.sections.push(loud, dt)
   }
 }
