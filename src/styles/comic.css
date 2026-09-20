@@ -1,0 +1,62 @@
+/* Comic page — every rule uses the skin contract (--u-*), never raw colours.
+ * Layout constants: --bugle-w from tokens.css keeps panels clear of the rail. */
+
+.comic-page { position: relative; }
+
+.comic-panel {
+  position: relative;
+  min-height: 100vh;
+  margin: 0 3vw 0 calc(var(--bugle-w) + 3vw);
+  border: var(--u-panel-border);
+  box-shadow: var(--u-panel-shadow);
+  background: var(--u-paper), var(--u-bg);
+  color: var(--u-ink);
+  font-family: var(--u-font-body);
+  overflow: hidden;
+  transition: margin-left 300ms ease;
+}
+.comic-panel[data-universe] { --u-scan-opacity: calc(var(--u-scanline) * 0.35); }
+.comic-panel::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,var(--u-scan-opacity)) 0 1px, transparent 1px 3px);
+  mix-blend-mode: multiply;
+}
+
+.comic-caption {
+  display: inline-block; padding: 6px 10px;
+  background: var(--u-caption-bg); color: var(--u-ink);
+  border: 2px solid var(--u-ink); box-shadow: 3px 3px 0 var(--u-ink);
+  font: 700 12px/1.3 var(--u-font-body); letter-spacing: .1em; text-transform: uppercase;
+}
+.comic-bubble {
+  position: relative; display: inline-block; padding: 10px 14px; max-width: 42ch;
+  background: #fff; color: #101010; border: 2px solid #101010; border-radius: 18px;
+  font: 600 14px/1.35 var(--u-font-body);
+}
+.comic-bubble::after {
+  content: ''; position: absolute; bottom: -12px; left: 22px;
+  border: 8px solid transparent; border-top: 12px solid #101010;
+}
+.comic-bubble[data-tail="right"]::after { left: auto; right: 22px; }
+.comic-sfx {
+  display: inline-block; font: 900 clamp(28px, 4vw, 56px)/1 var(--u-font-display);
+  color: var(--u-accent); -webkit-text-stroke: 2px var(--u-ink); text-shadow: 4px 4px 0 var(--u-accent-2);
+  transform: rotate(-8deg); letter-spacing: .02em;
+}
+.comic-still { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.comic-frame {
+  display: block; padding: 16px; text-decoration: none;
+  background: rgba(255,255,255,.92); color: #101010;
+  border: 2px solid #101010; box-shadow: 4px 4px 0 #101010;
+  transition: transform var(--u-duration) var(--u-ease), box-shadow var(--u-duration) var(--u-ease);
+}
+.comic-frame:hover { transform: translateY(-4px); box-shadow: 6px 8px 0 #101010; }
+.comic-frame-title { margin: 0 0 6px; font: 900 22px/1.05 var(--u-font-display); letter-spacing: .02em; }
+.comic-frame-blurb { margin: 0 0 10px; font-size: 13px; line-height: 1.45; }
+.comic-frame-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.comic-frame-tags li { padding: 2px 6px; border: 1px solid #101010; font: 700 10px/1.4 var(--u-font-body); letter-spacing: .08em; text-transform: uppercase; }
+
+@media (max-width: 767px) {
+  .comic-panel { margin: 0 12px; }
+}

@@ -11,6 +11,7 @@
 @import './styles/karen.css';
 @import './styles/locked.css';
 @import './styles/symbiote.css';
+@import './styles/comic.css';
 
 @tailwind base;
 @tailwind components;
