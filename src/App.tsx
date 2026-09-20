@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
 import { Home } from './pages/Home'
 
 // Phase 1 ships only `/`. The Phase 2/3 routes exist as locked stand-ins so
@@ -81,7 +81,7 @@ const router = createBrowserRouter([
       // Phase 3 — locked
       { path: '/mission',    element: locked(3, 'The Mission') },
       { path: '/multiverse', element: locked(3, 'The Multiverse') },
-      { path: '/visualizer', element: locked(3, 'Music Visualizer') },
+      { path: '/visualizer', element: <Navigate to="/mixtape" replace /> },
       { path: '/cyber',      element: locked(3, 'CyberSpider') },
 
       // Fallback — anything else gets the multiverse veil too.
