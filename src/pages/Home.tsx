@@ -4,11 +4,7 @@ import { SplashPanel } from '../comic/SplashPanel'
 import { GridPanel } from '../comic/GridPanel'
 import { Gutter } from '../comic/Gutter'
 import { NextIssue } from '../comic/NextIssue'
-// Explicit .tsx extension: on case-insensitive filesystems (Windows/macOS),
-// an extensionless './PageIndex' spuriously resolves against the sibling
-// './pageIndex.ts' helpers module (bundler tries .ts before .tsx), pulling
-// in the wrong file. The literal extension forces the exact target.
-import { PageIndex } from '../comic/PageIndex.tsx'
+import { PageIndex } from '../comic/PageIndex'
 import { UNIVERSES } from '../data/universes'
 import { useUniverseStore } from '../store/universeStore'
 import '../styles/comic.css'

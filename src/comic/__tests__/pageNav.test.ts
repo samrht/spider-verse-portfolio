@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { nextUniverse, labelFor, pageOf } from '../pageIndex'
+import { nextUniverse, labelFor, pageOf } from '../pageNav'
 
-describe('pageIndex helpers', () => {
+describe('pageNav helpers', () => {
   it('steps through story order without wrapping', () => {
     expect(nextUniverse('616', 1)).toBe('mcu')
     expect(nextUniverse('verse', 1)).toBe('verse')

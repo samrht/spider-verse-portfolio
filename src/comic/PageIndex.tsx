@@ -1,8 +1,23 @@
 import { useEffect, useState } from 'react'
 import { UNIVERSE_IDS, useUniverseStore } from '../store/universeStore'
 import { universeById } from '../data/universes'
-import { stillById } from '../data/stills'
-import { labelFor, nextUniverse, pageOf, scrollToUniverse } from './pageIndex'
+import { stillById, PAPER_FALLBACK } from '../data/stills'
+import { labelFor, nextUniverse, pageOf, scrollToUniverse } from './pageNav'
+
+// Fan-out thumbnail. Falls back to the paper texture on load error so a
+// missing/placeholder still file never shows a broken image (same guard
+// pattern as comic/primitives.tsx's <Still>).
+function ThumbImg({ src }: { src: string }) {
+  const [current, setCurrent] = useState(src)
+  return (
+    <img
+      src={current}
+      alt=""
+      loading="lazy"
+      onError={() => { if (current !== PAPER_FALLBACK) setCurrent(PAPER_FALLBACK) }}
+    />
+  )
+}
 
 // Fixed page number that doubles as the universe nav. Hover/focus fans out
 // four thumbnails; ←/→ flip pages. Bottom-left (KAREN owns bottom-right).
@@ -36,7 +51,7 @@ export function PageIndex() {
           return (
             <li key={id} data-universe={id}>
               <button type="button" onClick={() => { scrollToUniverse(id); setOpen(false) }} aria-current={id === active} data-spider-sense>
-                {still && <img src={still.thumb} alt="" loading="lazy" />}
+                {still && <ThumbImg src={still.thumb} />}
                 <span>p.{pageOf(id)} {labelFor(id)}</span>
               </button>
             </li>
