@@ -5,6 +5,7 @@ import { GridPanel } from '../comic/GridPanel'
 import { Gutter } from '../comic/Gutter'
 import { NextIssue } from '../comic/NextIssue'
 import { PageIndex } from '../comic/PageIndex'
+import { useComicMotion } from '../comic/useComicMotion'
 import { UNIVERSES } from '../data/universes'
 import { useUniverseStore } from '../store/universeStore'
 import '../styles/comic.css'
@@ -19,6 +20,7 @@ const SuitHUD = lazy(() => import('../components/SuitHUD/SuitHUD').then((m) => (
 // Home is a comic book: cover, four universe panels joined by gutters, back
 // cover. Cursor + spider-sense + Lenis are dynamic-imported after mount.
 export function Home() {
+  useComicMotion()
   const active = useUniverseStore((s) => s.activeUniverse)
 
   useEffect(() => {

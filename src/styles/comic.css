@@ -147,3 +147,14 @@
 .page-index-fan img { width: 96px; height: 60px; object-fit: cover; display: block; }
 .page-index-fan [aria-current="true"] { outline: 3px solid var(--u-accent); }
 @media (max-width: 767px) { .page-index { left: 12px; bottom: 12px; } .page-index-name { display: none; } .page-index-fan { display: none; } }
+
+/* — Motion (comic/motion.ts + comic/flourish.ts) — */
+/* Enter/frame targets stay hidden only once GSAP has bound (has-motion), so a
+ * failed import or reduced motion never hides content. */
+.has-motion [data-motion="enter"], .has-motion [data-motion="frame"] { visibility: hidden; }
+.mcu-reticle { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--u-accent); box-shadow: 0 0 12px var(--u-accent); pointer-events: none; }
+.toon-burst::before { content: ''; position: absolute; inset: -14px; background: repeating-conic-gradient(from 0deg, transparent 0 8deg, rgba(16,16,16,.6) 8deg 10deg); mask: radial-gradient(circle, transparent 55%, #000 56%, #000 100%); -webkit-mask: radial-gradient(circle, transparent 55%, #000 56%, #000 100%); pointer-events: none; animation: burst 500ms ease-out both; }
+@keyframes burst { from { transform: scale(.6); opacity: 1 } to { transform: scale(1.15); opacity: 0 } }
+.verse-glitch { animation: verse-tick 180ms steps(3) both; }
+@keyframes verse-tick { 0% { filter: none } 33% { filter: drop-shadow(-3px 0 #00e5ff) drop-shadow(3px 0 #ff2d6b); transform: translateX(-2px) } 66% { filter: drop-shadow(3px 0 #00e5ff) drop-shadow(-3px 0 #ff2d6b); transform: translateX(2px) } 100% { filter: none } }
+@media (prefers-reduced-motion: reduce) { .comic-gutter-caption { transform: none !important; } .verse-glitch, .toon-burst::before { animation: none !important; } }
