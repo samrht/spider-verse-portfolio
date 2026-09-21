@@ -104,3 +104,8 @@
   .karen-name { font-size: 0.8rem; letter-spacing: 0.24em; }
   .karen-status { font-size: 0.55rem; }
 }
+
+/* — Mount fade (Task 6: MCU-only KAREN) — */
+.karen-hud-mount { display: contents; }
+.karen-hud-mount.is-entering .karen-hud { animation: karen-in 300ms ease both; }
+@keyframes karen-in { from { opacity: 0; } to { opacity: 1; } }

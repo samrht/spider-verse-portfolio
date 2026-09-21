@@ -663,3 +663,16 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* — Bugle presentations per universe (BugleSkin data-skin) — */
+.bugle-skin[data-skin="616"] .daily-bugle { background: #f4e8c8 radial-gradient(circle, rgba(27,27,27,.25) .8px, transparent 1px) 0 0/5px 5px; color: #1b1b1b; border-right: 3px solid #1b1b1b; }
+.bugle-skin[data-skin="616"] .daily-bugle .bugle-masthead { font-family: 'Bangers', cursive; color: #1b1b1b; border-bottom: 3px double #1b1b1b; }
+.bugle-skin[data-skin="616"] .daily-bugle .bugle-card { background: #fffdf5; color: #1b1b1b; border: 1px solid #1b1b1b; box-shadow: 3px 3px 0 #1b1b1b; }
+.bugle-skin[data-skin="mcu"] .daily-bugle { background: #06090f; color: #e6f1ff; border-right: 1px solid #7fb7ff; }
+.bugle-skin[data-skin="mcu"] .daily-bugle .bugle-masthead { font-family: 'Rajdhani', sans-serif; letter-spacing: .3em; color: #7fb7ff; border-bottom: 1px solid #7fb7ff; }
+.bugle-skin[data-skin="mcu"] .daily-bugle .bugle-card { background: rgba(127,183,255,.06); border: 1px solid rgba(127,183,255,.35); box-shadow: none; }
+.bugle-skin[data-skin="toon"] .daily-bugle { background: #ffe14d; color: #101010; border-right: 5px solid #101010; }
+.bugle-skin[data-skin="toon"] .daily-bugle .bugle-masthead { font-family: 'Luckiest Guy', cursive; color: #ff3b3b; -webkit-text-stroke: 1px #101010; border-bottom: 4px solid #101010; }
+.bugle-skin[data-skin="toon"] .daily-bugle .bugle-card { background: #fff; border: 3px solid #101010; box-shadow: 4px 4px 0 #101010; }
+/* verse = the existing look; no override */
+.bugle-skin .daily-bugle, .bugle-skin .daily-bugle .bugle-masthead, .bugle-skin .daily-bugle .bugle-card { transition: background 400ms ease, color 400ms ease, border-color 400ms ease; }

@@ -115,10 +115,10 @@ function injectBaseStyles() {
       height: 14px;
       margin: -7px 0 0 -7px;
       border-radius: 50%;
-      background: var(--universe-primary, #ff2d2d);
+      background: var(--u-accent, var(--universe-primary, #ff2d2d));
       box-shadow:
-        0 0 12px var(--universe-primary, #ff2d2d),
-        0 0 24px var(--universe-primary, #ff2d2d);
+        0 0 12px var(--u-accent, var(--universe-primary, #ff2d2d)),
+        0 0 24px var(--u-accent, var(--universe-primary, #ff2d2d));
       mix-blend-mode: difference;
       pointer-events: none;
       z-index: 9998;
@@ -131,17 +131,17 @@ function injectBaseStyles() {
        the cursor renders as its solid pink primary, with a darker ink halo. */
     [data-universe="toon"] #${CURSOR_ID} {
       mix-blend-mode: normal;
-      background: var(--universe-primary, #6ec6f5);
+      background: var(--u-accent, var(--universe-primary, #6ec6f5));
       box-shadow:
         0 0 0 1.5px rgba(45, 31, 61, 0.55),
-        0 0 14px var(--universe-primary, #6ec6f5);
+        0 0 14px var(--u-accent, var(--universe-primary, #6ec6f5));
     }
     #${CURSOR_ID}.is-hover {
       width: 26px;
       height: 26px;
       margin: -13px 0 0 -13px;
       background: transparent;
-      border: 2px solid var(--universe-primary, #ff2d2d);
+      border: 2px solid var(--u-accent, var(--universe-primary, #ff2d2d));
     }
     [data-universe="toon"] #${CURSOR_ID}.is-hover {
       border-color: var(--universe-text, #2d1f3d);
