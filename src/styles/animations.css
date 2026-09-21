@@ -46,20 +46,16 @@
 
   /* High-contrast / glitch effects that don't read as "motion" but still
    * trigger vestibular issues: kill the chromatic split, the scanlines, and
-   * the KAREN flicker / portal glitch animations explicitly. */
+   * the KAREN flicker animations explicitly. */
   .karen-hud,
   .karen-status,
-  .locked-title,
-  .portal-card:hover {
+  .locked-title {
     animation: none !important;
   }
 
   .karen-hud { filter: none !important; }
   .locked-title::before,
   .locked-title::after { display: none !important; }
-
-  /* MCU's scanline sweep — disable. */
-  .decor-mcu::after { display: none !important; }
 
   /* The cursor still functions in reduced-motion (engine drops the elastic
    * lag), but kill its hover-grow transition. */

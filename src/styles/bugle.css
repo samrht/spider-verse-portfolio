@@ -5,9 +5,9 @@
  * regardless of which section the user is currently scrolled to. */
 
 /* Halftone dot overlay ----------------------------------------
- * Lifted from .decor-earth-1610 in sections.css. Rendered as a pseudo so it
- * sits above the background fill without polluting child layout. Children
- * must stay above z-index: 0 so they paint over the dots. */
+ * Rendered as a pseudo so it sits above the background fill without
+ * polluting child layout. Children must stay above z-index: 0 so they
+ * paint over the dots. */
 .bugle-surface {
   position: relative;
 }

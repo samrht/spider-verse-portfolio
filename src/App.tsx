@@ -3,9 +3,9 @@ import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-rou
 import { Home } from './pages/Home'
 
 // Phase 1 ships only `/`. The Phase 2/3 routes exist as locked stand-ins so
-// the URL surface area is real on day one — every linked portal in the
-// LockedPortals section already has somewhere to go. LockedPage is lazy so
-// the / route doesn't carry its bytes.
+// the URL surface area is real on day one — every teaser stamp on the comic's
+// back cover already has somewhere to go. LockedPage is lazy so the / route
+// doesn't carry its bytes.
 const LockedPage = lazy(() =>
   import('./pages/LockedPage').then((m) => ({ default: m.LockedPage })),
 )

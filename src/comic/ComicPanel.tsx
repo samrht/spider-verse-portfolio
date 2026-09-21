@@ -4,7 +4,7 @@ import { useUniverseStore, type Universe } from '../store/universeStore'
 
 // The frame around one universe. Owns the data-universe scope for its
 // subtree and reports itself as the active universe when it dominates the
-// viewport (same IO rule UniverseShell used: ≥ 55%).
+// viewport (≥ 55% intersection).
 export function ComicPanel({ universe, children, className = '' }: { universe: Universe; children: ReactNode; className?: string }) {
   const ref = useRef<HTMLElement>(null)
   useEffect(() => {

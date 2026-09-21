@@ -99,3 +99,40 @@
   .grid-frames { grid-template-columns: 1fr; }
   .splash-caption { position: static; margin: 0 24px 24px; }
 }
+
+/* — Gutter — */
+.comic-spread { position: relative; }
+.comic-gutter { position: relative; height: 8vh; background: #101010; margin: 0 3vw 0 calc(var(--bugle-w) + 3vw); display: flex; align-items: center; padding-left: 4vw; }
+.comic-gutter-caption { transform: translateX(-120%); }
+
+/* — Cover — */
+.comic-cover {
+  position: relative; min-height: 100vh; margin: 0 3vw 0 calc(var(--bugle-w) + 3vw);
+  border: var(--u-panel-border); box-shadow: var(--u-panel-shadow);
+  background: var(--u-paper), var(--u-bg); color: var(--u-ink);
+  display: grid; grid-template-rows: auto 1fr auto; transform-origin: left center; will-change: transform;
+}
+.cover-masthead { padding: 24px 32px 8px; display: flex; align-items: baseline; justify-content: space-between; border-bottom: 3px solid var(--u-ink); }
+.cover-masthead h1 { margin: 0; font: 900 clamp(36px, 6vw, 88px)/1 var(--u-font-display); letter-spacing: .04em; color: var(--u-accent); text-shadow: 4px 4px 0 var(--u-ink); }
+.cover-issue { display: flex; gap: 18px; font: 700 12px/1 var(--u-font-body); letter-spacing: .2em; }
+.cover-still { position: relative; overflow: hidden; }
+.cover-lines { margin: 0; padding: 18px 32px; list-style: none; display: flex; gap: 14px; flex-wrap: wrap; border-top: 3px solid var(--u-ink); }
+.cover-lines a { display: inline-block; padding: 8px 12px; background: var(--u-caption-bg); border: 2px solid var(--u-ink); box-shadow: 3px 3px 0 var(--u-ink); color: var(--u-ink); font: 900 14px/1 var(--u-font-display); letter-spacing: .06em; text-decoration: none; transform: rotate(-1.5deg); }
+.cover-lines li:nth-child(even) a { transform: rotate(1.5deg); }
+.cover-hint { position: absolute; right: 32px; bottom: 90px; margin: 0; font: 700 11px/1 var(--u-font-body); letter-spacing: .25em; opacity: .7; }
+
+/* — Back cover — */
+.comic-back { margin: 8vh 3vw 6vh calc(var(--bugle-w) + 3vw); border: var(--u-panel-border); box-shadow: var(--u-panel-shadow); background: var(--u-paper), var(--u-bg); color: var(--u-ink); padding: clamp(24px, 5vw, 64px); display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.back-contact p { max-width: 50ch; }
+.back-suit { margin-top: 12px; padding: 10px 16px; background: transparent; border: 2px solid var(--u-accent-2); color: var(--u-accent-2); font: 700 12px/1 var(--u-font-body); letter-spacing: .15em; cursor: pointer; }
+.back-teasers { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; align-content: start; }
+.back-teasers li { position: relative; padding: 18px; border: 2px dashed var(--u-ink); font: 900 20px/1 var(--u-font-display); letter-spacing: .04em; opacity: .85; }
+.back-stamp { position: absolute; right: 10px; top: -10px; padding: 3px 8px; background: var(--u-accent); color: #fff; border: 2px solid var(--u-ink); font: 900 10px/1 var(--u-font-body); letter-spacing: .2em; transform: rotate(6deg); }
+.back-credits { grid-column: 1 / -1; font-size: 12px; opacity: .8; border-top: 1px dashed var(--u-ink); padding-top: 16px; }
+.back-credits ul { padding-left: 18px; }
+
+@media (max-width: 767px) {
+  .comic-gutter, .comic-cover, .comic-back { margin-left: 12px; margin-right: 12px; }
+  .comic-back { grid-template-columns: 1fr; }
+  .cover-masthead { flex-direction: column; gap: 8px; }
+}

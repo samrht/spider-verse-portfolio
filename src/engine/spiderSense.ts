@@ -6,7 +6,7 @@ import { prefersReducedMotion } from './motion'
 // - On mouseenter: 3 staggered expanding rings + chromatic-aberration filter
 // - On mouseleave: cleanup
 //
-// Section-sized targets (e.g. UniverseShell) are filtered out because
+// Section-sized targets (e.g. a full comic panel) are filtered out because
 // viewport-spanning rings look terrible. We keep the data-attribute on those
 // elements as a semantic marker but don't decorate them.
 
