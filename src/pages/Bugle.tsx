@@ -23,11 +23,11 @@ const SECTION_SCOPE: Record<
   BugleCategory,
   { universe: string; token: 'primary' | 'accent' }
 > = {
-  technology:    { universe: 'mcu',   token: 'primary' }, // cyan
-  sports:        { universe: '616',   token: 'primary' }, // yellow
-  politics:      { universe: 'verse', token: 'primary' }, // red
-  science:       { universe: 'toon',  token: 'primary' }, // blue
-  entertainment: { universe: 'toon',  token: 'accent'  }, // pink
+  technology:    { universe: 'mcu',   token: 'primary' }, // light blue #7fb7ff
+  sports:        { universe: '616',   token: 'primary' }, // neon pink #ff2d6b #c0392b
+  politics:      { universe: 'verse', token: 'primary' }, // neon pink #ff2d6b
+  science:       { universe: 'toon',  token: 'primary' }, // red #ff3b3b
+  entertainment: { universe: 'toon',  token: 'accent'  }, // yellow #ffe14d
 }
 
 // Real broadsheets number issues by day-of-year. "Vol. 312" is a static

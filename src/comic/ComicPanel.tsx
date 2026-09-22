@@ -4,15 +4,24 @@ import { useUniverseStore, type Universe } from '../store/universeStore'
 
 // The frame around one universe. Owns the data-universe scope for its
 // subtree and reports itself as the active universe when it dominates the
-// viewport (≥ 55% intersection).
+// viewport: ≥ 55% of the panel is visible, or it fills ≥ 55% of the viewport
+// (the second case is what lets panels taller than ~1.8 viewports activate).
+const THRESHOLDS = Array.from({ length: 21 }, (_, i) => i / 20)
+
+function dominates(e: Pick<IntersectionObserverEntry, 'intersectionRatio'> & Partial<IntersectionObserverEntry>): boolean {
+  if (e.intersectionRatio >= 0.55) return true
+  const vh = e.rootBounds?.height ?? window.innerHeight
+  return !!e.intersectionRect && vh > 0 && e.intersectionRect.height >= 0.55 * vh
+}
+
 export function ComicPanel({ universe, children, className = '' }: { universe: Universe; children: ReactNode; className?: string }) {
   const ref = useRef<HTMLElement>(null)
   useEffect(() => {
     const el = ref.current
     if (!el || typeof IntersectionObserver === 'undefined') return
     const io = new IntersectionObserver(
-      (entries) => { for (const e of entries) if (e.intersectionRatio >= 0.55) useUniverseStore.getState().setUniverse(universe) },
-      { threshold: [0, 0.25, 0.55, 0.75, 1] },
+      (entries) => { for (const e of entries) if (dominates(e)) useUniverseStore.getState().setUniverse(universe) },
+      { threshold: THRESHOLDS },
     )
     io.observe(el)
     return () => io.disconnect()

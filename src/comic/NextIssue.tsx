@@ -14,7 +14,7 @@ export function NextIssue() {
       <div className="back-contact">
         <h2 className="comic-title">TO BE CONTINUED…</h2>
         <p>Want to build something? The mask is on the desk.</p>
-        <p className="splash-links">{BIO.links.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>)}</p>
+        <p className="splash-links">{BIO.links.map((l) => <a key={l.href} href={l.href} {...(l.href.startsWith('mailto:') ? {} : { target: '_blank', rel: 'noopener noreferrer' })}>{l.label}</a>)}</p>
         <button type="button" className="back-suit" onClick={() => void openSuit()} data-spider-sense>[ INITIALIZE SUIT SYSTEMS ]</button>
       </div>
       <ul className="back-teasers" aria-label="Next issue">

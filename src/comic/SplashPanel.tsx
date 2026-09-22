@@ -31,7 +31,7 @@ export function SplashPanel({ universe }: { universe: Universe }) {
         {universe === '616' ? (
           <div className="splash-focus" data-testid="focus-bio" data-motion="enter">
             {BIO.lines.map((l) => <p key={l}>{l}</p>)}
-            <p className="splash-links">{BIO.links.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>)}</p>
+            <p className="splash-links">{BIO.links.map((l) => <a key={l.href} href={l.href} {...(l.href.startsWith('mailto:') ? {} : { target: '_blank', rel: 'noopener noreferrer' })}>{l.label}</a>)}</p>
           </div>
         ) : focus ? (
           <div className="splash-focus" data-testid="focus-project" data-motion="enter"><ProjectFrame project={focus} /></div>

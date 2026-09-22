@@ -35,11 +35,12 @@ export function bindAll(root: HTMLElement, gsap: GSAP, ScrollTrigger: ST): () =>
     // Own the caption transform: without this GSAP bakes the CSS
     // translateX(-120%) into a pixel `x` and xPercent stacks on top of it.
     if (caption) gsap.set(caption, { x: 0, xPercent: captionOffset(0) })
+    gsap.set(panel, { transformOrigin: 'left top' })
     triggers.push(ScrollTrigger.create({
       trigger: g, start: 'top bottom', end: 'top top', scrub: true,
       onUpdate: (self) => {
         const { y, rot } = panelSettle(self.progress)
-        gsap.set(panel, { y, rotation: rot, transformOrigin: 'left top' })
+        gsap.set(panel, { y, rotation: rot })
         if (caption) gsap.set(caption, { xPercent: captionOffset(self.progress) })
       },
     }))

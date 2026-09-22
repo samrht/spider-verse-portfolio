@@ -55,9 +55,12 @@ export function Home() {
       <Suspense fallback={null}>
         <BugleSkin />
         {active === 'mcu' && (
-          <div className="karen-hud-mount is-entering">
-            <KarenHUD />
-          </div>
+          // own boundary: KAREN's lazy chunk must not blank the rest of the chrome
+          <Suspense fallback={null}>
+            <div className="karen-hud-mount is-entering">
+              <KarenHUD />
+            </div>
+          </Suspense>
         )}
         <SymbioteToggle />
         <BugleOverlay />

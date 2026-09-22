@@ -29,4 +29,13 @@ describe('ComicPanel', () => {
     act(() => lastCallback!([{ intersectionRatio: 0.6 }]))
     expect(useUniverseStore.getState().activeUniverse).toBe('toon')
   })
+  it('activates a panel taller than the viewport once it fills most of the screen', () => {
+    render(<ComicPanel universe="verse"><p>y</p></ComicPanel>)
+    const rootBounds = { height: 740 } as DOMRectReadOnly
+    // 2x-viewport panel: ratio can never reach 0.55, but it covers 60% / 100% of the screen
+    act(() => lastCallback!([{ intersectionRatio: 0.2, rootBounds, intersectionRect: { height: 296 } as DOMRectReadOnly }]))
+    expect(useUniverseStore.getState().activeUniverse).toBe('616')
+    act(() => lastCallback!([{ intersectionRatio: 0.3, rootBounds, intersectionRect: { height: 444 } as DOMRectReadOnly }]))
+    expect(useUniverseStore.getState().activeUniverse).toBe('verse')
+  })
 })

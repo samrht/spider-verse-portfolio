@@ -3,7 +3,8 @@ import { stillById } from '../data/stills'
 import { Still } from './primitives'
 
 // Issue #1 cover: first viewport. Cover lines anchor to the panels. The
-// page-lift (Task 7) pins this section briefly and rotates it away.
+// page-lift (Task 7) is scroll-scrubbed and unpinned: it rotates away as the
+// cover scrolls out and re-closes on back-scroll.
 export function Cover() {
   const still = stillById(COVER.stillId)!
   return (

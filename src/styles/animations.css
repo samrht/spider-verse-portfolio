@@ -25,11 +25,6 @@
   to   { transform: scaleY(1); transform-origin: top; }
 }
 
-@keyframes scan-line {
-  from { transform: translateY(-100%); }
-  to   { transform: translateY(100vh); }
-}
-
 /* Reduced-motion: kill every CSS animation/transition/smooth-scroll.
  * GSAP- and JS-driven motion is gated in src/engine/motion.ts and Home.tsx. */
 @media (prefers-reduced-motion: reduce) {

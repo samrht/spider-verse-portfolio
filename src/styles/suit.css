@@ -451,104 +451,6 @@
 .suit-boot-char { opacity: 0; }
 
 /* ============================================================
-   Earth-928 section "INITIALIZE SUIT SYSTEMS" panel
-   (Entry-point wiring — Step 6)
-   ============================================================ */
-.suit-os-panel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 100%;
-  margin-top: 2rem;
-  padding: 1rem 1.25rem;
-  background: var(--universe-surface);
-  border: 1px solid var(--universe-primary);
-  color: var(--universe-text);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.16em;
-  cursor: pointer;
-  text-transform: uppercase;
-  box-shadow: var(--universe-glow);
-  transition: transform 160ms ease, background 160ms ease;
-}
-.suit-os-panel:hover {
-  transform: translateY(-2px);
-  background: color-mix(in srgb, var(--universe-primary) 12%, transparent);
-}
-.suit-os-status { color: var(--universe-primary); }
-.suit-os-cta {
-  color: var(--universe-primary);
-  border: 1px solid var(--universe-primary);
-  padding: 0.35rem 0.75rem;
-}
-
-/* ============================================================
-   Home page "SUIT SYSTEMS STANDING BY / [ ACTIVATE ]" banner
-   ============================================================ */
-.suit-standby {
-  position: relative;
-  padding: clamp(3rem, 8vw, 6rem) 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  background: var(--universe-bg);
-  color: var(--universe-text);
-  text-align: center;
-  border-top: 1px solid color-mix(in srgb, var(--universe-primary) 25%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--universe-primary) 25%, transparent);
-}
-.suit-standby-emblem {
-  position: relative;
-  width: 110px;
-  height: 110px;
-  display: grid;
-  place-items: center;
-  color: var(--universe-primary);
-}
-.suit-standby-ring {
-  position: absolute;
-  inset: 0;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  opacity: 0;
-  animation: suit-standby-ring 3s ease-out infinite;
-}
-.suit-standby-ring:nth-child(2) { animation-delay: 1s; }
-.suit-standby-ring:nth-child(3) { animation-delay: 2s; }
-@keyframes suit-standby-ring {
-  0%   { transform: scale(0.5); opacity: 0.9; }
-  100% { transform: scale(1.8); opacity: 0; }
-}
-.suit-standby-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.32em;
-  color: var(--universe-primary);
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-.suit-standby-btn {
-  font-family: var(--font-mono);
-  font-size: var(--text-base);
-  letter-spacing: 0.3em;
-  background: transparent;
-  border: 1px solid var(--universe-primary);
-  color: var(--universe-primary);
-  padding: 0.7rem 1.6rem;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
-}
-.suit-standby-btn:hover {
-  background: var(--universe-primary);
-  color: var(--universe-bg);
-  box-shadow: 0 0 22px var(--universe-primary);
-}
-
-/* ============================================================
    /suit standalone page (used in Step 4)
    ============================================================ */
 .suit-page {
@@ -741,7 +643,6 @@
   .suit-hud-scanline,
   .suit-threat-badge,
   .suit-radar-sweep,
-  .suit-standby-ring,
   .suit-active-threats,
   .suit-panel {
     animation: none !important;

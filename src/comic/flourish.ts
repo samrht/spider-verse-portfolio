@@ -1,8 +1,7 @@
-import glitchFrag from '../shaders/glitch.frag?raw'
-
 // Per-skin flourishes, triggered by the 'comic:enter' event bindAll fires.
 // 616/mcu/toon: sfx word pop · mcu: HUD reticle scan over the still · toon: speed
-// lines on the first frame · verse: chromatic glitch tick every 6–9 s.
+// lines on the first frame · verse: chromatic glitch tick every 6–9 s, starting
+// once the verse panel first enters (a WebGL glitch quad is a follow-up).
 type GSAP = typeof import('gsap').gsap
 
 export function bindFlourishes(root: HTMLElement, gsap: GSAP): () => void {
@@ -37,15 +36,19 @@ export function bindFlourishes(root: HTMLElement, gsap: GSAP): () => void {
 
     if (id === 'verse') {
       let timer = 0
+      let off = 0
       const tick = () => {
         panel.classList.add('verse-glitch')
-        setTimeout(() => panel.classList.remove('verse-glitch'), 180)
+        off = window.setTimeout(() => panel.classList.remove('verse-glitch'), 180)
         timer = window.setTimeout(tick, 6000 + Math.random() * 3000)
       }
-      timer = window.setTimeout(tick, 4000)
-      cleanups.push(() => clearTimeout(timer))
+      const start = () => {
+        panel.removeEventListener('comic:enter', start)
+        timer = window.setTimeout(tick, 1500)
+      }
+      panel.addEventListener('comic:enter', start)
+      cleanups.push(() => { panel.removeEventListener('comic:enter', start); clearTimeout(timer); clearTimeout(off) })
     }
   })
-  void glitchFrag // reserved: a WebGL glitch quad is a follow-up; v1 uses the CSS tick above
   return () => cleanups.forEach((c) => c())
 }
