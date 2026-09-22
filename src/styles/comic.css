@@ -123,9 +123,9 @@
 .cover-masthead h1 { margin: 0; font: 900 clamp(36px, 6vw, 88px)/1 var(--u-font-display); letter-spacing: .04em; color: var(--u-accent); text-shadow: 4px 4px 0 var(--u-ink); white-space: nowrap; }
 .cover-issue { display: flex; gap: 18px; font: 700 12px/1 var(--u-font-body); letter-spacing: .2em; white-space: nowrap; }
 .cover-still { position: relative; overflow: hidden; min-height: 0; }
-/* Brand New Day street swing: Spider-Man sits high in the 16:9 crop, so bias the
- * object-fit crop upward on short viewports to keep his head in frame. */
-.cover-still .comic-still { object-position: 50% 12%; }
+/* Symbiote Spider-Man #1: the portrait cover sits centred at full height over a
+ * blurred copy of itself, so keep the object-fit crop centred on every viewport. */
+.cover-still .comic-still { object-position: 50% 45%; }
 .cover-lines { margin: 0; padding: 18px 32px; list-style: none; display: flex; gap: 14px; flex-wrap: wrap; border-top: 3px solid var(--u-ink); }
 .cover-lines li { display: flex; }
 .cover-lines a { display: block; padding: 8px 12px; background: var(--u-caption-bg); border: 2px solid var(--u-ink); box-shadow: 3px 3px 0 var(--u-ink); color: var(--u-ink); font: 900 14px/1 var(--u-font-display); letter-spacing: .06em; text-decoration: none; transform: rotate(-1.5deg); }

@@ -14,8 +14,8 @@ export const PAPER_FALLBACK = '/stills/paper-fallback.svg'
 
 export const STILLS: readonly Still[] = [
   { id: 'still-cover', universeId: 'cover', src: '/stills/cover/cover.jpg', thumb: '/stills/cover/cover-thumb.jpg',
-    alt: 'Spider-Man swinging down a sun-flared Manhattan street toward the camera (Spider-Man: Brand New Day poster art)',
-    credit: { title: 'Spider-Man: Brand New Day (2026), poster art', owner: 'Columbia Pictures / Marvel Studios' } },
+    alt: 'Symbiote Spider-Man #1 cover: black-suit Spider-Man crouched mid-swing over Manhattan with a giant Mysterio looming behind',
+    credit: { title: 'Symbiote Spider-Man #1 (2019), cover by Greg Land, Jay Leisten & Frank D’Armata', owner: 'Marvel Comics' } },
   // 616 splash shows Amazing Fantasy #15; the page index fan uses the ASM #300 thumb instead (see still-616-asm300).
   { id: 'still-616-hero', universeId: '616', src: '/stills/616/hero.jpg', thumb: '/stills/616/asm300-thumb.jpg',
     alt: 'Amazing Fantasy #15 cover: Spider-Man swinging over the city with a thug under one arm',
