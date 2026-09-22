@@ -27,8 +27,10 @@ export function PageIndex() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement | null)?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      const t = e.target as HTMLElement | null
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return
+      // an open dialog (Bugle full edition) owns the keyboard; don't scroll the page behind it
+      if (document.querySelector('[aria-modal="true"]')) return
       if (e.key === 'ArrowRight') scrollToUniverse(nextUniverse(useUniverseStore.getState().activeUniverse, 1))
       if (e.key === 'ArrowLeft') scrollToUniverse(nextUniverse(useUniverseStore.getState().activeUniverse, -1))
     }

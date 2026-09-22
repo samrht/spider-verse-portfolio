@@ -13,7 +13,7 @@ export function Cover() {
         <h1>{COVER.masthead}</h1>
         <p className="cover-issue"><span>{COVER.issue}</span><span>{COVER.price}</span></p>
       </header>
-      <div className="cover-still"><Still still={still} eager /></div>
+      <div className="cover-still"><Still still={still} priority /></div>
       <ul className="cover-lines">
         {COVER.coverLines.map((c) => (
           <li key={c.universeId}><a href={`#u-${c.universeId}`}>{c.text}</a></li>

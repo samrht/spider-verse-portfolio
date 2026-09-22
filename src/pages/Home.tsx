@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Cover } from '../comic/Cover'
 import { SplashPanel } from '../comic/SplashPanel'
 import { GridPanel } from '../comic/GridPanel'
@@ -22,6 +22,18 @@ const SuitHUD = lazy(() => import('../components/SuitHUD/SuitHUD').then((m) => (
 export function Home() {
   useComicMotion()
   const active = useUniverseStore((s) => s.activeUniverse)
+  // KAREN is MCU-only: fade in on entry, keep mounted 300 ms on exit to fade out.
+  const [prevActive, setPrevActive] = useState(active)
+  const [karenLeaving, setKarenLeaving] = useState(false)
+  if (prevActive !== active) {
+    setPrevActive(active)
+    setKarenLeaving(prevActive === 'mcu')
+  }
+  useEffect(() => {
+    if (!karenLeaving) return
+    const t = window.setTimeout(() => setKarenLeaving(false), 300)
+    return () => clearTimeout(t)
+  }, [karenLeaving])
 
   useEffect(() => {
     let teardownCursor: (() => void) | null = null
@@ -54,10 +66,10 @@ export function Home() {
     <>
       <Suspense fallback={null}>
         <BugleSkin />
-        {active === 'mcu' && (
+        {(active === 'mcu' || karenLeaving) && (
           // own boundary: KAREN's lazy chunk must not blank the rest of the chrome
           <Suspense fallback={null}>
-            <div className="karen-hud-mount is-entering">
+            <div className={`karen-hud-mount ${active === 'mcu' ? 'is-entering' : 'is-leaving'}`}>
               <KarenHUD />
             </div>
           </Suspense>

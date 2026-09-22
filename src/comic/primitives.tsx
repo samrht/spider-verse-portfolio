@@ -18,14 +18,15 @@ export function SfxWord({ children, ...rest }: { children: ReactNode } & HTMLAtt
 
 // An official still. Falls back to the paper texture on load error so a
 // missing file never shows a broken image.
-export function Still({ still, eager = false, className = '' }: { still: StillDef; eager?: boolean; className?: string }) {
+export function Still({ still, eager = false, priority = false, className = '' }: { still: StillDef; eager?: boolean; priority?: boolean; className?: string }) {
   const [src, setSrc] = useState(still.src)
   return (
     <img
       className={`comic-still ${className}`.trim()}
       src={src}
       alt={still.alt}
-      loading={eager ? 'eager' : 'lazy'}
+      loading={eager || priority ? 'eager' : 'lazy'}
+      fetchPriority={priority ? 'high' : undefined}
       decoding="async"
       onError={() => { if (src !== PAPER_FALLBACK) setSrc(PAPER_FALLBACK) }}
     />

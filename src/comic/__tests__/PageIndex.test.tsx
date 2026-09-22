@@ -19,4 +19,22 @@ describe('PageIndex', () => {
     fireEvent.error(img)
     expect(img.getAttribute('src')).toBe(PAPER_FALLBACK)
   })
+
+  it('flips to the next page on ArrowRight, but not while a dialog is open', () => {
+    const target = document.createElement('section')
+    target.id = 'u-mcu'
+    const spy = vi.fn()
+    target.scrollIntoView = spy
+    document.body.appendChild(target)
+    render(<PageIndex />)
+    fireEvent.keyDown(window, { key: 'ArrowRight' })
+    expect(spy).toHaveBeenCalledTimes(1)
+    const modal = document.createElement('div')
+    modal.setAttribute('aria-modal', 'true')
+    document.body.appendChild(modal)
+    fireEvent.keyDown(window, { key: 'ArrowRight' })
+    expect(spy).toHaveBeenCalledTimes(1)
+    modal.remove()
+    target.remove()
+  })
 })

@@ -109,3 +109,5 @@
 .karen-hud-mount { display: contents; }
 .karen-hud-mount.is-entering .karen-hud { animation: karen-in 300ms ease both; }
 @keyframes karen-in { from { opacity: 0; } to { opacity: 1; } }
+.karen-hud-mount.is-leaving .karen-hud { animation: karen-out 300ms ease both; pointer-events: none; }
+@keyframes karen-out { from { opacity: 1; } to { opacity: 0; } }
