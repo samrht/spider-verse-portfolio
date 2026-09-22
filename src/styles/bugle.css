@@ -665,6 +665,11 @@
 }
 
 /* — Bugle presentations per universe (BugleSkin data-skin) — */
+/* The rail is scoped data-universe="verse", so re-point its --universe-* tokens per
+ * skin; otherwise headlines, tabs and meta keep verse's pale text on light cards. */
+.bugle-skin[data-skin="616"] .daily-bugle { --universe-text: #1b1b1b; --universe-primary: #c0392b; --universe-accent: #ffd400; --universe-bg: #f4e8c8; --universe-surface: rgba(27,27,27,.06); }
+.bugle-skin[data-skin="mcu"] .daily-bugle { --universe-text: #e6f1ff; --universe-primary: #7fb7ff; --universe-accent: #ff2d2d; --universe-bg: #06090f; --universe-surface: rgba(127,183,255,.08); }
+.bugle-skin[data-skin="toon"] .daily-bugle { --universe-text: #101010; --universe-primary: #d62828; --universe-accent: #1f6feb; --universe-bg: #ffe14d; --universe-surface: rgba(16,16,16,.06); }
 .bugle-skin[data-skin="616"] .daily-bugle { background: #f4e8c8 radial-gradient(circle, rgba(27,27,27,.25) .8px, transparent 1px) 0 0/5px 5px; color: #1b1b1b; border-right: 3px solid #1b1b1b; }
 .bugle-skin[data-skin="616"] .daily-bugle .bugle-masthead { font-family: 'Bangers', cursive; color: #1b1b1b; border-bottom: 3px double #1b1b1b; }
 .bugle-skin[data-skin="616"] .daily-bugle .bugle-masthead h2 { color: #c0392b; }
