@@ -3,6 +3,7 @@ import { render, screen, within } from '@testing-library/react'
 import { SplashPanel } from '../SplashPanel'
 import { GridPanel } from '../GridPanel'
 import { universeById } from '../../data/universes'
+import { stillById } from '../../data/stills'
 
 vi.mock('../../store/audioStore', () => ({ useAudioStore: { getState: () => ({ playFX: vi.fn() }) } }))
 vi.stubGlobal('IntersectionObserver', class { observe() {} disconnect() {} unobserve() {} })
@@ -11,7 +12,7 @@ describe('SplashPanel', () => {
   it('616 shows the bio, the chapter title, the still and the sfx word', () => {
     render(<SplashPanel universe="616" />)
     expect(screen.getByRole('heading', { level: 2, name: 'ORIGINS' })).toBeInTheDocument()
-    expect(screen.getByAltText(/classic comic art/i)).toBeInTheDocument()
+    expect(screen.getByAltText(stillById(universeById('616').stillId)!.alt)).toBeInTheDocument()
     expect(screen.getByTestId('focus-bio')).toBeInTheDocument()
     expect(screen.getByText(universeById('616').sfx)).toHaveClass('comic-sfx')
   })

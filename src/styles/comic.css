@@ -116,12 +116,19 @@
   background: var(--u-paper), var(--u-bg); color: var(--u-ink);
   display: grid; grid-template-rows: auto minmax(0, 1fr) auto; transform-origin: left center; will-change: transform;
 }
-.cover-masthead { padding: 24px 32px 8px; display: flex; align-items: baseline; justify-content: space-between; border-bottom: 3px solid var(--u-ink); }
-.cover-masthead h1 { margin: 0; font: 900 clamp(36px, 6vw, 88px)/1 var(--u-font-display); letter-spacing: .04em; color: var(--u-accent); text-shadow: 4px 4px 0 var(--u-ink); }
-.cover-issue { display: flex; gap: 18px; font: 700 12px/1 var(--u-font-body); letter-spacing: .2em; }
+/* The masthead and issue line never wrap and align flex-end (not baseline), so the
+ * row height depends only on font-size/line-height and the cover still doesn't
+ * shift when the (much narrower) web fonts swap in over the fallback (CLS). */
+.cover-masthead { padding: 24px 32px 8px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; overflow: hidden; border-bottom: 3px solid var(--u-ink); }
+.cover-masthead h1 { margin: 0; font: 900 clamp(36px, 6vw, 88px)/1 var(--u-font-display); letter-spacing: .04em; color: var(--u-accent); text-shadow: 4px 4px 0 var(--u-ink); white-space: nowrap; }
+.cover-issue { display: flex; gap: 18px; font: 700 12px/1 var(--u-font-body); letter-spacing: .2em; white-space: nowrap; }
 .cover-still { position: relative; overflow: hidden; min-height: 0; }
+/* Brand New Day street swing: Spider-Man sits high in the 16:9 crop, so bias the
+ * object-fit crop upward on short viewports to keep his head in frame. */
+.cover-still .comic-still { object-position: 50% 12%; }
 .cover-lines { margin: 0; padding: 18px 32px; list-style: none; display: flex; gap: 14px; flex-wrap: wrap; border-top: 3px solid var(--u-ink); }
-.cover-lines a { display: inline-block; padding: 8px 12px; background: var(--u-caption-bg); border: 2px solid var(--u-ink); box-shadow: 3px 3px 0 var(--u-ink); color: var(--u-ink); font: 900 14px/1 var(--u-font-display); letter-spacing: .06em; text-decoration: none; transform: rotate(-1.5deg); }
+.cover-lines li { display: flex; }
+.cover-lines a { display: block; padding: 8px 12px; background: var(--u-caption-bg); border: 2px solid var(--u-ink); box-shadow: 3px 3px 0 var(--u-ink); color: var(--u-ink); font: 900 14px/1 var(--u-font-display); letter-spacing: .06em; text-decoration: none; transform: rotate(-1.5deg); }
 .cover-lines li:nth-child(even) a { transform: rotate(1.5deg); }
 .cover-hint { position: absolute; right: 32px; bottom: 90px; margin: 0; font: 700 11px/1 var(--u-font-body); letter-spacing: .25em; opacity: .7; }
 

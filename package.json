@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "beatmaps": "node scripts/analyse-track.mjs public/audio/mixtape/*.mp3 --out public/beatmaps"
+    "beatmaps": "node scripts/analyse-track.mjs public/audio/mixtape/*.mp3 --out public/beatmaps",
+    "thumbs": "node scripts/make-thumbs.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
