@@ -45,6 +45,16 @@ describe('getAccessToken', () => {
     expect(url).toBe('https://accounts.spotify.com/api/token')
     expect((init.headers as Record<string, string>).Authorization).toBe('Basic ' + Buffer.from('id:secret').toString('base64'))
   })
+  it('trims pasted values and drops a stray KEY= prefix', async () => {
+    _resetTokenCache()
+    const fetchFn = vi.fn(async () => new Response(JSON.stringify({ access_token: 'tok', expires_in: 3600 }), { status: 200 }))
+    const messy = { SPOTIFY_CLIENT_ID: ' id\n', SPOTIFY_CLIENT_SECRET: 'secret ', SPOTIFY_REFRESH_TOKEN: 'SPOTIFY_REFRESH_TOKEN=rt\r\n' }
+    await getAccessToken(messy, fetchFn as unknown as typeof fetch, 0)
+    const [, init] = fetchFn.mock.calls[0] as unknown as [string, RequestInit]
+    expect((init.headers as Record<string, string>).Authorization).toBe('Basic ' + Buffer.from('id:secret').toString('base64'))
+    expect(String(init.body)).toContain('refresh_token=rt')
+    expect(String(init.body)).not.toContain('SPOTIFY_REFRESH_TOKEN')
+  })
   it('throws on a non-200', async () => {
     _resetTokenCache()
     const fetchFn = vi.fn(async () => new Response('nope', { status: 400 }))
