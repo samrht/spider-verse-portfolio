@@ -8,11 +8,12 @@ vi.mock('../../store/audioStore', () => ({ useAudioStore: { getState: () => ({ p
 vi.stubGlobal('IntersectionObserver', class { observe() {} disconnect() {} unobserve() {} })
 
 describe('SplashPanel', () => {
-  it('616 shows the bio, the chapter title and the still', () => {
+  it('616 shows the bio, the chapter title, the still and the sfx word', () => {
     render(<SplashPanel universe="616" />)
     expect(screen.getByRole('heading', { level: 2, name: 'ORIGINS' })).toBeInTheDocument()
     expect(screen.getByAltText(/classic comic art/i)).toBeInTheDocument()
     expect(screen.getByTestId('focus-bio')).toBeInTheDocument()
+    expect(screen.getByText(universeById('616').sfx)).toHaveClass('comic-sfx')
   })
   it('mcu shows the first flagship project as the focus block and lists the rest', () => {
     render(<SplashPanel universe="mcu" />)

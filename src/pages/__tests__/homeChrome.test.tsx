@@ -12,7 +12,10 @@ vi.mock('../../store/audioStore', () => ({ useAudioStore: { getState: () => ({ p
 vi.mock('lenis', () => ({ default: class { raf() {} destroy() {} } }))
 // GSAP must not run against jsdom: useComicMotion dynamic-imports it, so bindAll
 // executes against these stubs (the DOM walk stays real, the tweens do not).
-vi.mock('gsap', () => ({ gsap: { registerPlugin: vi.fn(), set: vi.fn(), to: vi.fn(), fromTo: vi.fn() } }))
+vi.mock('gsap', () => {
+  const timeline = () => { const tl = { to: () => tl }; return tl }
+  return { gsap: { registerPlugin: vi.fn(), set: vi.fn(), to: vi.fn(), fromTo: vi.fn(), timeline } }
+})
 vi.mock('gsap/ScrollTrigger', () => ({ ScrollTrigger: { create: vi.fn(() => ({ kill: vi.fn() })), refresh: vi.fn() } }))
 vi.mock('../../engine/webCursor', () => ({ initCursor: () => () => {} }))
 vi.mock('../../engine/spiderSense', () => ({ initSpiderSense: () => () => {} }))

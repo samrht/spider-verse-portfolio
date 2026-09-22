@@ -72,14 +72,18 @@ export function bindAll(root: HTMLElement, gsap: GSAP, ScrollTrigger: ST): () =>
     }))
   })
 
-  // Cover lift: rotate the cover away once the visitor starts scrolling.
+  // Cover lift: scrubbed to the scroll (no wall-clock tween), so a visitor who
+  // stops mid-scroll sees the cover half open and scrolling back re-closes it.
+  // Unpinned on purpose: pinning with spacing leaves a viewport of invisible
+  // cover to scroll through before page 1; scrubbing over the cover's own
+  // height hands off to the 616 panel at the top exactly as the turn completes.
   const cover = root.querySelector<HTMLElement>('[data-motion="cover"]')
   if (cover) {
     gsap.set(cover, { transformPerspective: 1600, transformOrigin: 'left center' })
-    triggers.push(ScrollTrigger.create({
-      trigger: cover, start: 'top top', end: '+=10%', once: true,
-      onEnter: () => gsap.to(cover, { rotationY: -100, duration: 0.6, ease: 'power2.in', onComplete: () => gsap.set(cover, { clearProps: 'transform' }) }),
-    }))
+    const lift = gsap.timeline({ paused: true })
+      .to(cover, { rotationY: -100, ease: 'none', duration: 0.8 }, 0)
+      .to(cover, { autoAlpha: 0, ease: 'none', duration: 0.2 }, 0.8)
+    triggers.push(ScrollTrigger.create({ trigger: cover, start: 'top top', end: 'bottom top', scrub: true, animation: lift }))
   }
 
   return () => {

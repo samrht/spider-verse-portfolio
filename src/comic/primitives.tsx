@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { ReactNode } from 'react'
+import type { HTMLAttributes, ReactNode } from 'react'
 import { PAPER_FALLBACK, type Still as StillDef } from '../data/stills'
 
 // Small comic devices. All styling comes from comic.css via the skin contract.
@@ -12,8 +12,8 @@ export function SpeechBubble({ children, tail = 'left' }: { children: ReactNode;
   return <div className="comic-bubble" data-tail={tail}>{children}</div>
 }
 
-export function SfxWord({ children }: { children: ReactNode }) {
-  return <span className="comic-sfx" aria-hidden="true">{children}</span>
+export function SfxWord({ children, ...rest }: { children: ReactNode } & HTMLAttributes<HTMLSpanElement>) {
+  return <span className="comic-sfx" aria-hidden="true" {...rest}>{children}</span>
 }
 
 // An official still. Falls back to the paper texture on load error so a

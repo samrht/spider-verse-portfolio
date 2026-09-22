@@ -67,7 +67,7 @@
 .splash-still { grid-area: still; position: relative; overflow: hidden; border-right: var(--u-panel-border); }
 .splash-still-right .splash-still { border-right: 0; border-left: var(--u-panel-border); }
 .splash-still .comic-still { transform: scale(1.12); will-change: transform; }
-.splash-body { grid-area: body; padding: clamp(24px, 6vw, 72px); display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+.splash-body { grid-area: body; position: relative; padding: clamp(24px, 6vw, 72px); display: flex; flex-direction: column; justify-content: center; gap: 14px; }
 .comic-kicker { margin: 0; font: 700 12px/1 var(--u-font-body); letter-spacing: .2em; opacity: .75; }
 .comic-title { margin: 0; font: 900 clamp(44px, 7vw, 104px)/.95 var(--u-font-display); letter-spacing: .02em; text-shadow: 4px 4px 0 var(--u-accent-2); }
 [data-universe="mcu"] .comic-title { text-shadow: none; letter-spacing: .12em; font-weight: 600; }
@@ -81,6 +81,7 @@
 .splash-rest a { color: inherit; font-weight: 700; text-decoration: none; }
 .splash-rest span { opacity: .6; font-size: 11px; letter-spacing: .1em; }
 .splash-caption { position: absolute; left: 24px; bottom: 24px; }
+.splash .comic-sfx { position: absolute; right: 24px; top: 24px; z-index: 2; }
 
 /* — Grid — */
 .comic-panel.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; padding: clamp(24px, 5vw, 64px); }
@@ -107,15 +108,18 @@
 
 /* — Cover — */
 .comic-cover {
-  position: relative; min-height: 100vh; margin: 0 3vw 0 calc(var(--bugle-w) + 3vw);
+  /* Exactly one viewport tall so the scrubbed lift (comic/motion.ts) completes
+   * as the 616 panel reaches the top; the still row shrinks to fit rather than
+   * growing to the image's intrinsic height. */
+  position: relative; height: 100vh; box-sizing: border-box; margin: 0 3vw 0 calc(var(--bugle-w) + 3vw);
   border: var(--u-panel-border); box-shadow: var(--u-panel-shadow);
   background: var(--u-paper), var(--u-bg); color: var(--u-ink);
-  display: grid; grid-template-rows: auto 1fr auto; transform-origin: left center; will-change: transform;
+  display: grid; grid-template-rows: auto minmax(0, 1fr) auto; transform-origin: left center; will-change: transform;
 }
 .cover-masthead { padding: 24px 32px 8px; display: flex; align-items: baseline; justify-content: space-between; border-bottom: 3px solid var(--u-ink); }
 .cover-masthead h1 { margin: 0; font: 900 clamp(36px, 6vw, 88px)/1 var(--u-font-display); letter-spacing: .04em; color: var(--u-accent); text-shadow: 4px 4px 0 var(--u-ink); }
 .cover-issue { display: flex; gap: 18px; font: 700 12px/1 var(--u-font-body); letter-spacing: .2em; }
-.cover-still { position: relative; overflow: hidden; }
+.cover-still { position: relative; overflow: hidden; min-height: 0; }
 .cover-lines { margin: 0; padding: 18px 32px; list-style: none; display: flex; gap: 14px; flex-wrap: wrap; border-top: 3px solid var(--u-ink); }
 .cover-lines a { display: inline-block; padding: 8px 12px; background: var(--u-caption-bg); border: 2px solid var(--u-ink); box-shadow: 3px 3px 0 var(--u-ink); color: var(--u-ink); font: 900 14px/1 var(--u-font-display); letter-spacing: .06em; text-decoration: none; transform: rotate(-1.5deg); }
 .cover-lines li:nth-child(even) a { transform: rotate(1.5deg); }

@@ -1,7 +1,7 @@
 import glitchFrag from '../shaders/glitch.frag?raw'
 
 // Per-skin flourishes, triggered by the 'comic:enter' event bindAll fires.
-// 616: sfx word pop · mcu: HUD reticle scan over the still · toon: speed
+// 616/mcu/toon: sfx word pop · mcu: HUD reticle scan over the still · toon: speed
 // lines on the first frame · verse: chromatic glitch tick every 6–9 s.
 type GSAP = typeof import('gsap').gsap
 
@@ -10,7 +10,7 @@ export function bindFlourishes(root: HTMLElement, gsap: GSAP): () => void {
   root.querySelectorAll<HTMLElement>('.comic-panel').forEach((panel) => {
     const id = panel.getAttribute('data-universe')
     const onEnter = () => {
-      if (id === '616' || id === 'toon') {
+      if (id === '616' || id === 'mcu' || id === 'toon') {
         const sfx = panel.querySelector('.comic-sfx')
         if (sfx) gsap.fromTo(sfx, { scale: 0, rotation: -30 }, { scale: 1, rotation: -8, duration: 0.5, ease: 'back.out(2)' })
       }
