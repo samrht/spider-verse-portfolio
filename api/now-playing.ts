@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { buildNowPlaying, getAccessToken, type NowPlaying, type SpotifyEnv } from './_spotify'
+// ".js" is required: package.json is "type": "module", so Vercel runs this as
+// native ESM and Node will not resolve an extensionless relative import.
+import { buildNowPlaying, getAccessToken, type NowPlaying, type SpotifyEnv } from './_spotify.js'
 
 // Public "what the owner is listening to" feed. Tokens never leave the
 // function; the CDN absorbs visitor polling via s-maxage.
