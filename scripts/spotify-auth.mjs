@@ -2,7 +2,8 @@
 // One-time: obtain a refresh token for the owner's account.
 //
 //   1. https://developer.spotify.com/dashboard → create app → add redirect
-//      URI exactly: http://localhost:8888/callback
+//      URI exactly: http://127.0.0.1:8888/callback (Spotify rejects "localhost";
+//      loopback redirects must be http + an explicit 127.0.0.1)
 //   2. SPOTIFY_CLIENT_ID=... SPOTIFY_CLIENT_SECRET=... node scripts/spotify-auth.mjs
 //   3. Open the printed URL, approve, and paste the printed refresh token into
 //      Vercel: printf '%s' '<token>' | npx vercel env add SPOTIFY_REFRESH_TOKEN production
@@ -14,7 +15,7 @@ const id = process.env.SPOTIFY_CLIENT_ID
 const secret = process.env.SPOTIFY_CLIENT_SECRET
 if (!id || !secret) { console.error('set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET'); process.exit(1) }
 
-const redirect = 'http://localhost:8888/callback'
+const redirect = 'http://127.0.0.1:8888/callback'
 const scope = 'user-read-currently-playing user-read-recently-played'
 const url = new URL('https://accounts.spotify.com/authorize')
 url.search = new URLSearchParams({ client_id: id, response_type: 'code', redirect_uri: redirect, scope }).toString()
@@ -22,7 +23,7 @@ url.search = new URLSearchParams({ client_id: id, response_type: 'code', redirec
 console.log('\nOpen this URL and approve:\n\n' + url.toString() + '\n')
 
 createServer(async (req, res) => {
-  const u = new URL(req.url, 'http://localhost:8888')
+  const u = new URL(req.url, 'http://127.0.0.1:8888')
   if (u.pathname !== '/callback') { res.statusCode = 404; res.end(); return }
   const code = u.searchParams.get('code')
   if (!code) { res.end('missing code'); return }
@@ -39,4 +40,4 @@ createServer(async (req, res) => {
   res.end('Done — go back to the terminal.')
   console.log('\nSPOTIFY_REFRESH_TOKEN=' + json.refresh_token + '\n')
   process.exit(0)
-}).listen(8888, () => console.log('listening on ' + redirect))
+}).listen(8888, '127.0.0.1', () => console.log('listening on ' + redirect))
