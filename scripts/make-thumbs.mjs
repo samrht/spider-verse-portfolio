@@ -11,9 +11,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const STILLS_DIR = join(ROOT, 'public', 'stills')
 const WIDTH = 400
 // Thumbs no manifest entry references (posix paths relative to public/stills).
-// 616's page-index thumb is deliberately the ASM #300 cover (asm300-thumb.jpg),
-// so the Amazing Fantasy #15 hero gets no thumb of its own.
-const SKIP = ['616/hero-thumb.jpg']
+const SKIP = []
 
 function* jpegs(dir) {
   for (const name of readdirSync(dir)) {
