@@ -195,6 +195,33 @@ describe('useSignal', () => {
     expect(mic.stop).toHaveBeenCalled()
     await act(async () => { resolveStart() })
     expect(mic.sample).not.toHaveBeenCalled()
+    expect(onResult).not.toHaveBeenCalled()
+  })
+
+  // R4: a cancelled mic run never reports. Quick OFF -> ON: the first run's
+  // late rejection must not reach the new attempt's onResult.
+  it('a stale mic start that rejects after OFF -> ON never reports', async () => {
+    const rejects: Array<(e: Error) => void> = []
+    const makeProvider = (): SignalProvider => ({
+      mode: 'live',
+      start: vi.fn(() => new Promise<void>((_r, rej) => { rejects.push(rej) })),
+      stop: vi.fn(),
+      sample: vi.fn(),
+    })
+    const first = makeProvider()
+    const second = makeProvider()
+    const makeMic = vi.fn().mockReturnValueOnce(first).mockReturnValueOnce(second)
+    const onResult = vi.fn()
+    const h = renderHook(
+      ({ on }: { on: boolean }) => useSignal({ beatMapFor: () => false, mic: { on, onResult }, makeMic }),
+      { initialProps: { on: true } },
+    )
+    await waitFor(() => expect(first.start).toHaveBeenCalled())
+    h.rerender({ on: false })
+    h.rerender({ on: true })
+    await waitFor(() => expect(second.start).toHaveBeenCalled())
+    await act(async () => { rejects[0](new Error('stopped')) })
+    expect(onResult).not.toHaveBeenCalled()
   })
 
   it('interpolatePosition holds the stamped position while paused and never goes negative', () => {

@@ -132,11 +132,13 @@ export function useSignal(inputs: SignalInputs = {}) {
         p = await pick()
         pending = p
         await p.start()
+        pending = null
       } catch {
         failed = true
         p = await pickFallback()
       }
-      if (kind === 'mic') onMicResult.current?.(!failed)
+      // R4: a stale (cancelled) run never reports.
+      if (kind === 'mic' && !cancelled) onMicResult.current?.(!failed)
       if (cancelled) { p.stop(); return }
       active = p
       setProvider(p)
