@@ -16,7 +16,7 @@
 .inked-title { margin: 2px 0; font: 20px/1 'Bangers', cursive; letter-spacing: .04em; color: #c0392b; }
 .inked-artist { margin: 0; font-size: 11px; opacity: .8; }
 .inked-tape { flex: 1; min-width: 120px; }
-.inked-scrub { width: 100%; accent-color: #c0392b; }
+.inked-scrub { width: 100%; accent-color: #c0392b; border: 2px solid #1b1b1b; background: #fffdf5; padding: 2px; box-sizing: border-box; }
 .inked-times { display: flex; justify-content: space-between; font-size: 10px; }
 .inked-transport { display: flex; align-items: center; gap: 6px; }
 .inked-btn {
