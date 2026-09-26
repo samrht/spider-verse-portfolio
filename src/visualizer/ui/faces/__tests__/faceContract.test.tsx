@@ -4,12 +4,14 @@ import { fakeControls } from './fakeControls'
 import { GlitchCassette } from '../GlitchCassette'
 import { InkedCassette } from '../InkedCassette'
 import { HudRing } from '../HudRing'
+import { Boombox } from '../Boombox'
 import type { Face } from '../index'
 
 const ALL: Array<[string, Face]> = [
   ['glitch-cassette', GlitchCassette],
   ['inked-cassette', InkedCassette],
   ['hud-ring', HudRing],
+  ['boombox', Boombox],
 ]
 
 describe.each(ALL)('%s face contract', (id, FaceC) => {
