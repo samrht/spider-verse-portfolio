@@ -79,6 +79,12 @@
   background: transparent; border: 0; cursor: pointer;
 }
 
+/* Tablet: reels + title + transport need ~690px, so the scrubber drops to its own row. */
+@media (min-width: 768px) and (max-width: 919px) {
+  .viz-deck-bar { flex-wrap: wrap; row-gap: 8px; }
+  .viz-deck-scrub { order: 3; flex: 1 1 100%; }
+  .viz-deck-transport { margin-left: auto; }
+}
 @media (max-width: 767px) {
   .viz-deck-bar { flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
   .viz-deck-now { min-width: 0; flex: 1 1 100%; }

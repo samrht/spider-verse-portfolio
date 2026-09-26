@@ -24,4 +24,9 @@ describe('/mixtape layout CSS', () => {
     expect(rule(tablet, '.face-inked')).toMatch(/flex-wrap:\s*wrap/)
     expect(rule(tablet, '.inked-tape')).toMatch(/flex:\s*1 1 100%/)
   })
+  it('verse glitch bar moves the scrubber to its own row on tablets so Hide stays on screen', () => {
+    const tablet = read('visualizer.css').split('@media (min-width: 768px) and (max-width: 919px)')[1] ?? ''
+    expect(rule(tablet, '.viz-deck-bar')).toMatch(/flex-wrap:\s*wrap/)
+    expect(rule(tablet, '.viz-deck-scrub')).toMatch(/flex:\s*1 1 100%/)
+  })
 })
