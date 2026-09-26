@@ -1,0 +1,40 @@
+/* 616 · Inked Cassette (spec §4.2): cream shell, 3px ink, hard offset shadow. */
+.viz-deck[data-face='inked-cassette'] { background: transparent; border-top: 0; backdrop-filter: none; }
+.face-inked {
+  display: flex; align-items: center; gap: 16px; margin: 0 16px 14px; padding: 10px 14px;
+  background: #fffdf5; color: #1b1b1b; border: 3px solid #1b1b1b; box-shadow: 4px 4px 0 #1b1b1b;
+  font-family: 'Share Tech Mono', ui-monospace, monospace;
+}
+.inked-shell { display: flex; align-items: center; gap: 10px; flex: none; }
+.inked-reel {
+  width: 30px; height: 30px; border-radius: 50%; border: 3px solid #1b1b1b; flex: none;
+  background: repeating-conic-gradient(#1b1b1b 0 20deg, #fffdf5 0 60deg);
+}
+.viz-deck.is-playing .inked-reel { animation: viz-spin 1.6s linear infinite; }
+.inked-label { background: #fffdf5; border: 2px solid #1b1b1b; padding: 4px 10px; transform: rotate(-1.5deg); min-width: 150px; }
+.inked-movie { margin: 0; font-size: 9px; letter-spacing: .15em; text-transform: uppercase; }
+.inked-title { margin: 2px 0; font: 20px/1 'Bangers', cursive; letter-spacing: .04em; color: #c0392b; }
+.inked-artist { margin: 0; font-size: 11px; opacity: .8; }
+.inked-tape { flex: 1; min-width: 120px; }
+.inked-scrub { width: 100%; accent-color: #c0392b; }
+.inked-times { display: flex; justify-content: space-between; font-size: 10px; }
+.inked-transport { display: flex; align-items: center; gap: 6px; }
+.inked-btn {
+  width: 30px; height: 30px; display: grid; place-items: center; background: #fffdf5; color: #1b1b1b;
+  border: 2px solid #1b1b1b; box-shadow: 2px 2px 0 #1b1b1b; cursor: pointer; font-size: 13px;
+}
+.inked-btn.is-active { background: #ffd400; }
+.inked-play {
+  width: 44px; height: 44px; border-radius: 50%; background: #ffd400; color: #1b1b1b;
+  border: 3px solid #1b1b1b; box-shadow: 2px 2px 0 #1b1b1b; cursor: pointer; font-size: 16px;
+  transform: scale(calc(1 + var(--beat, 0) * .06));
+}
+.inked-volume { display: flex; align-items: center; gap: 4px; font-size: 9px; }
+.inked-volume input { width: 70px; accent-color: #1b1b1b; }
+@media (prefers-reduced-motion: reduce) { .viz-deck.is-playing .inked-reel { animation: none; } .inked-play { transform: none; } }
+@media (max-width: 767px) {
+  .face-inked { flex-wrap: wrap; gap: 8px; margin: 0 8px 8px; }
+  .inked-shell, .inked-tape { flex: 1 1 100%; }
+  .inked-transport { flex: 1 1 100%; justify-content: space-between; }
+  .inked-side, .inked-volume { display: none; }
+}

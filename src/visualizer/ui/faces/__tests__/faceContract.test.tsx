@@ -2,10 +2,12 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { fakeControls } from './fakeControls'
 import { GlitchCassette } from '../GlitchCassette'
+import { InkedCassette } from '../InkedCassette'
 import type { Face } from '../index'
 
 const ALL: Array<[string, Face]> = [
   ['glitch-cassette', GlitchCassette],
+  ['inked-cassette', InkedCassette],
 ]
 
 describe.each(ALL)('%s face contract', (id, FaceC) => {
