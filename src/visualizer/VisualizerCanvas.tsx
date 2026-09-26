@@ -17,6 +17,7 @@ export interface VisualizerCanvasProps {
   onFallback?: () => void      // WebGL unavailable / shader failed
   onDegrade?: () => void       // frames still slow after the halve (verse drops its CSS split)
   capture?: FrameSink | null   // clip recording: receives each rendered frame
+  paletteOverride?: [string, string, string] | null  // album-art colours, or null for the universe palette
 }
 
 // Synchronous probe: a real GL context check, no async work, safe under
@@ -35,7 +36,7 @@ function hasWebGL(): boolean {
   }
 }
 
-function Field({ signal, trackKey, debug, onDegrade, capture }: VisualizerCanvasProps) {
+function Field({ signal, trackKey, debug, onDegrade, capture, paletteOverride }: VisualizerCanvasProps) {
   const gl = useThree((s) => s.gl)
   const n = useMemo(
     () =>
@@ -57,6 +58,7 @@ function Field({ signal, trackKey, debug, onDegrade, capture }: VisualizerCanvas
     field.setUniverse(universe, firstUniverse.current)
     firstUniverse.current = false
   }, [field, universe])
+  useEffect(() => { field.setPaletteOverride(paletteOverride ?? null) }, [field, paletteOverride])
   useEffect(() => onReducedMotionChange((r) => field.setReducedMotion(r)), [field])
   // R14: only a real track change replays the emblem (the field keeps its
   // own monotonic clock, so no time argument is needed).

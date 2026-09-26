@@ -51,3 +51,40 @@ describe('ParticleField.setUniverse', () => {
     expect(f.snapshot().style).toBe(1)
   })
 })
+
+describe('ParticleField.setPaletteOverride', () => {
+  it('tweens to the override without changing style or blend', () => {
+    const f = new ParticleField(200)
+    f.setUniverse('mcu', true)
+    const before = f.snapshot()
+    f.setPaletteOverride(['#112233', '#445566', '#778899'])
+    f.update(sig(), 1)
+    const s = f.snapshot()
+    expect(s.palette).toEqual(['#112233', '#445566', '#778899'])
+    expect(s.style).toBe(before.style)
+    expect(s.blending).toBe(before.blending)
+  })
+
+  it('null returns to the universe palette', () => {
+    const f = new ParticleField(200)
+    f.setUniverse('616', true)
+    const universe = f.snapshot().palette
+    f.setPaletteOverride(['#112233', '#445566', '#778899'])
+    f.update(sig(), 1)
+    f.setPaletteOverride(null)
+    f.update(sig(), 1)
+    expect(f.snapshot().palette).toEqual(universe)
+  })
+
+  it('a universe switch during an override keeps the override colours but takes the new style', () => {
+    const f = new ParticleField(200)
+    f.setUniverse('616', true)
+    f.setPaletteOverride(['#112233', '#445566', '#778899'])
+    f.update(sig(), 1)
+    f.setUniverse('mcu')
+    f.update(sig(), 1)
+    const s = f.snapshot()
+    expect(s.palette).toEqual(['#112233', '#445566', '#778899'])
+    expect(s.style).toBe(1)
+  })
+})

@@ -38,7 +38,9 @@ export class ParticleField {
     uMotion: THREE.IUniform<number>
   }
   private reduced = false
-  private tween: { from: THREE.Color[]; to: THREE.Color[]; t: number; style: VizStyle; applied: boolean } | null = null
+  private universe: Universe = 'verse'
+  private override: THREE.Color[] | null = null
+  private tween: { from: THREE.Color[]; to: THREE.Color[]; t: number; style: VizStyle | null; applied: boolean } | null = null
   private sm = { bass: 0, mids: 0, highs: 0 }
   // R13: the morph machine is clocked from accumulated frame dt, never from
   // playback position (which stays the BeatMap lookup key in useSignal).
@@ -93,8 +95,9 @@ export class ParticleField {
   // mode flip at the midpoint. `instant` (first mount) and reduced motion skip
   // the tween so a fresh page never flashes verse first.
   setUniverse(u: Universe, instant = false): void {
+    this.universe = u
     const style = VIZ_STYLES[u]
-    const to = paletteFor(u)
+    const to = this.override ? this.override.map((c) => c.clone()) : paletteFor(u)
     if (instant || this.reduced) {
       this.u.uPalette.value.forEach((c, i) => c.copy(to[i]))
       this.applyStyle(style)
@@ -102,6 +105,19 @@ export class ParticleField {
       return
     }
     this.tween = { from: this.u.uPalette.value.map((c) => c.clone()), to, t: 0, style, applied: false }
+  }
+
+  // Album-art colours (listen-modes spec §4.2): tween the palette only; the
+  // universe's dot style and blend stay. null tweens back to the universe.
+  setPaletteOverride(colors: [string, string, string] | null): void {
+    this.override = colors ? colors.map((c) => new THREE.Color(c)) : null
+    const to = this.override ? this.override.map((c) => c.clone()) : paletteFor(this.universe)
+    if (this.reduced) {
+      this.u.uPalette.value.forEach((c, i) => c.copy(to[i]))
+      this.tween = null
+      return
+    }
+    this.tween = { from: this.u.uPalette.value.map((c) => c.clone()), to, t: 0, style: null, applied: true }
   }
 
   private applyStyle(s: VizStyle): void {
@@ -116,7 +132,7 @@ export class ParticleField {
     if (!tw) return
     tw.t = Math.min(1, tw.t + dt / TWEEN_S)
     this.u.uPalette.value.forEach((c, i) => c.lerpColors(tw.from[i], tw.to[i], tw.t))
-    if (!tw.applied && tw.t >= 0.5) { this.applyStyle(tw.style); tw.applied = true }
+    if (!tw.applied && tw.t >= 0.5 && tw.style) { this.applyStyle(tw.style); tw.applied = true }
     if (tw.t >= 1) this.tween = null
   }
 
