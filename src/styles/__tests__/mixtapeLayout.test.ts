@@ -19,4 +19,9 @@ describe('/mixtape layout CSS', () => {
     expect(desktop).not.toMatch(/max-width/)
     expect(desktop).not.toMatch(/flex-wrap:\s*wrap/)
   })
+  it('inked cassette moves the tape to its own row on tablets so Hide stays on screen', () => {
+    const tablet = read('faces/inked.css').split('@media (min-width: 768px) and (max-width: 919px)')[1] ?? ''
+    expect(rule(tablet, '.face-inked')).toMatch(/flex-wrap:\s*wrap/)
+    expect(rule(tablet, '.inked-tape')).toMatch(/flex:\s*1 1 100%/)
+  })
 })

@@ -32,6 +32,12 @@
 .inked-volume { display: flex; align-items: center; gap: 4px; font-size: 9px; }
 .inked-volume input { width: 70px; accent-color: #1b1b1b; }
 @media (prefers-reduced-motion: reduce) { .viz-deck.is-playing .inked-reel { animation: none; } .inked-play { transform: none; } }
+/* Tablet: shell + transport alone need ~700px, so the tape drops to its own row. */
+@media (min-width: 768px) and (max-width: 919px) {
+  .face-inked { flex-wrap: wrap; row-gap: 8px; }
+  .inked-tape { order: 3; flex: 1 1 100%; }
+  .inked-transport { margin-left: auto; }
+}
 @media (max-width: 767px) {
   .face-inked { flex-wrap: wrap; gap: 8px; margin: 0 8px 8px; }
   .inked-shell, .inked-tape { flex: 1 1 100%; }
