@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Cover } from '../comic/Cover'
 import { SplashPanel } from '../comic/SplashPanel'
 import { GridPanel } from '../comic/GridPanel'
@@ -7,7 +8,7 @@ import { NextIssue } from '../comic/NextIssue'
 import { PageIndex } from '../comic/PageIndex'
 import { useComicMotion } from '../comic/useComicMotion'
 import { UNIVERSES } from '../data/universes'
-import { useUniverseStore } from '../store/universeStore'
+import { UNIVERSE_IDS, useUniverseStore, type Universe } from '../store/universeStore'
 import '../styles/comic.css'
 
 // Fixed chrome stays lazy so GSAP/Howler stay off the critical path.
@@ -22,6 +23,16 @@ const SuitHUD = lazy(() => import('../components/SuitHUD/SuitHUD').then((m) => (
 export function Home() {
   useComicMotion()
   const active = useUniverseStore((s) => s.activeUniverse)
+  // Coming back from /mixtape ("/#u-toon") lands on that universe's page.
+  const { hash } = useLocation()
+  useEffect(() => {
+    const id = hash.startsWith('#u-') ? hash.slice(3) : ''
+    if (!(UNIVERSE_IDS as readonly string[]).includes(id)) return
+    const u = id as Universe
+    useUniverseStore.getState().setUniverse(u)
+    const raf = requestAnimationFrame(() => document.getElementById(`u-${u}`)?.scrollIntoView({ block: 'start' }))
+    return () => cancelAnimationFrame(raf)
+  }, [hash])
   // KAREN is MCU-only: fade in on entry, keep mounted 300 ms on exit to fade out.
   const [prevActive, setPrevActive] = useState(active)
   const [karenLeaving, setKarenLeaving] = useState(false)

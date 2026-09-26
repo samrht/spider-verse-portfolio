@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { Universe } from '../store/universeStore'
 import { UNIVERSE_IDS, useUniverseStore } from '../store/universeStore'
 import { universeById } from '../data/universes'
 import { stillById, PAPER_FALLBACK } from '../data/stills'
 import { labelFor, nextUniverse, pageOf, scrollToUniverse } from './pageNav'
+import '../styles/page-index.css'
 
 // Fan-out thumbnail. Falls back to the paper texture on load error so a
 // missing/placeholder still file never shows a broken image (same guard
@@ -21,9 +23,14 @@ function ThumbImg({ src }: { src: string }) {
 
 // Fixed page number that doubles as the universe nav. Hover/focus fans out
 // four thumbnails; ←/→ flip pages. Bottom-left (KAREN owns bottom-right).
-export function PageIndex() {
+export function PageIndex({ onSelect = scrollToUniverse }: { onSelect?: (u: Universe) => void } = {}) {
   const active = useUniverseStore((s) => s.activeUniverse)
   const [open, setOpen] = useState(false)
+  const select = useRef(onSelect)
+
+  useEffect(() => {
+    select.current = onSelect
+  })
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -31,8 +38,8 @@ export function PageIndex() {
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return
       // an open dialog (Bugle full edition) owns the keyboard; don't scroll the page behind it
       if (document.querySelector('[aria-modal="true"]')) return
-      if (e.key === 'ArrowRight') scrollToUniverse(nextUniverse(useUniverseStore.getState().activeUniverse, 1))
-      if (e.key === 'ArrowLeft') scrollToUniverse(nextUniverse(useUniverseStore.getState().activeUniverse, -1))
+      if (e.key === 'ArrowRight') select.current(nextUniverse(useUniverseStore.getState().activeUniverse, 1))
+      if (e.key === 'ArrowLeft') select.current(nextUniverse(useUniverseStore.getState().activeUniverse, -1))
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -52,7 +59,7 @@ export function PageIndex() {
           const still = stillById(u.stillId)
           return (
             <li key={id} data-universe={id}>
-              <button type="button" onClick={() => { scrollToUniverse(id); setOpen(false) }} aria-current={id === active} data-spider-sense>
+              <button type="button" onClick={() => { onSelect(id); setOpen(false) }} aria-current={id === active} data-spider-sense>
                 {still && <ThumbImg src={still.thumb} />}
                 <span>p.{pageOf(id)} {labelFor(id)}</span>
               </button>

@@ -3,6 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { useUniverseStore } from '../../store/universeStore'
 
+Element.prototype.scrollIntoView = vi.fn()
+
 vi.mock('../../components/DailyBugle', () => ({ DailyBugle: () => null }))
 vi.mock('../../components/BugleOverlay', () => ({ BugleOverlay: () => null }))
 vi.mock('../../components/SuitHUD/SuitHUD', () => ({ SuitHUD: () => null }))
@@ -33,5 +35,17 @@ describe('Home chrome', () => {
     rerender(<MemoryRouter><Home /></MemoryRouter>)
     await waitFor(() => expect(screen.getByTestId('karen')).toBeInTheDocument())
     expect(screen.getByText(/p\.2\/4/)).toBeInTheDocument()
+  })
+
+  it('a #u-<id> hash selects that universe on load', async () => {
+    useUniverseStore.setState({ activeUniverse: '616' })
+    render(<MemoryRouter initialEntries={['/#u-toon']}><Home /></MemoryRouter>)
+    await waitFor(() => expect(useUniverseStore.getState().activeUniverse).toBe('toon'))
+  })
+
+  it('ignores an unknown hash', () => {
+    useUniverseStore.setState({ activeUniverse: '616' })
+    render(<MemoryRouter initialEntries={['/#u-nope']}><Home /></MemoryRouter>)
+    expect(useUniverseStore.getState().activeUniverse).toBe('616')
   })
 })

@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { PageIndex } from '../PageIndex'
 import { PAPER_FALLBACK } from '../../data/stills'
+import { useUniverseStore } from '../../store/universeStore'
 
 Element.prototype.scrollIntoView = vi.fn()
 
@@ -36,5 +37,15 @@ describe('PageIndex', () => {
     expect(spy).toHaveBeenCalledTimes(1)
     modal.remove()
     target.remove()
+  })
+
+  it('calls onSelect instead of scrolling when given one (click and arrow keys)', () => {
+    const onSelect = vi.fn()
+    useUniverseStore.setState({ activeUniverse: '616' })
+    render(<PageIndex onSelect={onSelect} />)
+    fireEvent.click(screen.getAllByRole('button').find((b) => b.textContent?.includes('p.3'))!)
+    expect(onSelect).toHaveBeenLastCalledWith('toon')
+    fireEvent.keyDown(window, { key: 'ArrowRight' })
+    expect(onSelect).toHaveBeenLastCalledWith('mcu')
   })
 })
