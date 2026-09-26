@@ -27,6 +27,7 @@ export function PageIndex({ onSelect = scrollToUniverse }: { onSelect?: (u: Univ
   const active = useUniverseStore((s) => s.activeUniverse)
   const [open, setOpen] = useState(false)
   const select = useRef(onSelect)
+  const touched = useRef(false)
 
   useEffect(() => {
     select.current = onSelect
@@ -47,8 +48,14 @@ export function PageIndex({ onSelect = scrollToUniverse }: { onSelect?: (u: Univ
 
   return (
     <nav className={`page-index ${open ? 'is-open' : ''}`} aria-label="Universes"
-      onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}
-      onFocus={() => setOpen(true)} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false) }}>
+      // Hover-open is mouse-only, and a touch tap's focus doesn't open it: on
+      // phones the label's click is the single toggle (otherwise the tap's
+      // synthesized hover/focus opens it and the click closes it again).
+      onPointerEnter={(e) => { if (e.pointerType === 'mouse') setOpen(true) }}
+      onPointerLeave={(e) => { if (e.pointerType === 'mouse') setOpen(false) }}
+      onPointerDown={(e) => { touched.current = e.pointerType !== 'mouse' }}
+      onFocus={() => { if (!touched.current) setOpen(true) }}
+      onBlur={(e) => { touched.current = false; if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false) }}>
       <button type="button" className="page-index-label" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <span className="page-index-num">p.{pageOf(active)}/{UNIVERSE_IDS.length}</span>
         <span className="page-index-name"> · {labelFor(active)}</span>

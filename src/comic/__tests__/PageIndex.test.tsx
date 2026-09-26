@@ -6,6 +6,16 @@ import { useUniverseStore } from '../../store/universeStore'
 
 Element.prototype.scrollIntoView = vi.fn()
 
+// jsdom has no PointerEvent, so fireEvent would drop pointerType; a minimal
+// stand-in lets the touch vs mouse paths be tested for real.
+if (typeof window.PointerEvent === 'undefined') {
+  class PointerEventStub extends MouseEvent {
+    pointerType: string
+    constructor(type: string, init: PointerEventInit = {}) { super(type, init); this.pointerType = init.pointerType ?? '' }
+  }
+  vi.stubGlobal('PointerEvent', PointerEventStub)
+}
+
 describe('PageIndex', () => {
   it('reads p.1/4 for the default store state', () => {
     render(<PageIndex />)
@@ -47,5 +57,21 @@ describe('PageIndex', () => {
     expect(onSelect).toHaveBeenLastCalledWith('toon')
     fireEvent.keyDown(window, { key: 'ArrowRight' })
     expect(onSelect).toHaveBeenLastCalledWith('mcu')
+  })
+
+  it('a touch tap opens the index with one tap (no hover/focus double-toggle)', () => {
+    render(<PageIndex />)
+    const label = document.querySelector('.page-index-label') as HTMLButtonElement
+    fireEvent.pointerDown(label, { pointerType: 'touch' })
+    fireEvent.focus(label)
+    fireEvent.click(label)
+    expect(label.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  it('a mouse still opens the index on hover', () => {
+    render(<PageIndex />)
+    const nav = document.querySelector('.page-index') as HTMLElement
+    fireEvent.pointerEnter(nav, { pointerType: 'mouse' })
+    expect(nav.classList.contains('is-open')).toBe(true)
   })
 })
