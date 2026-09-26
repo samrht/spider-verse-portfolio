@@ -25,6 +25,8 @@ export function HudRing({ c }: FaceProps) {
           onPointerDown={(e) => { dragging.current = true; e.currentTarget.setPointerCapture?.(e.pointerId); seekAt(e) }}
           onPointerMove={(e) => { if (dragging.current) seekAt(e) }}
           onPointerUp={() => { dragging.current = false }}
+          onPointerCancel={() => { dragging.current = false }}
+          onLostPointerCapture={() => { dragging.current = false }}
         >
           <circle cx="32" cy="32" r={R} className="hud-arc-track" />
           <circle cx="32" cy="32" r={R} className="hud-arc-fill" strokeDasharray={CIRC} strokeDashoffset={CIRC * (1 - c.pct / 100)} transform="rotate(-90 32 32)" />

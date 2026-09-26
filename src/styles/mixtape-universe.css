@@ -23,8 +23,7 @@
 @media (prefers-reduced-motion: reduce) { .viz-page .viz-flash { display: none; } }
 
 /* Verse deck title: red/cyan split with a small chromatic flicker on the beat (spec §4.2) */
-.face-glitch .viz-deck-title { text-shadow: 2px 0 #00e5ff, -2px 0 #ff2d6b; }
-.face-glitch .viz-deck-title { transform: translateX(calc(max(var(--beat, 0) - .7, 0) * 6px)); }
+.face-glitch .viz-deck-title { text-shadow: 2px 0 #00e5ff, -2px 0 #ff2d6b; transform: translateX(calc(max(var(--beat, 0) - .7, 0) * 6px)); }
 @media (prefers-reduced-motion: reduce) { .face-glitch .viz-deck-title { transform: none; } }
 
 /* Chrome follows the comic skins */
@@ -41,4 +40,7 @@
 @media (max-width: 767px) {
   .viz-back-long { display: none; }
   .viz-topright { top: 44px; left: 12px; right: 12px; justify-content: flex-end; flex-wrap: wrap; }
+  /* Home hides the fan on phones (scroll switches pages); /mixtape needs it to switch universe */
+  .viz-page .page-index-fan { display: grid; grid-template-columns: repeat(2, auto); }
+  .viz-page .page-index-fan img { width: 64px; height: 40px; }
 }

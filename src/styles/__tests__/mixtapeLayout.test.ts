@@ -29,4 +29,17 @@ describe('/mixtape layout CSS', () => {
     expect(rule(tablet, '.viz-deck-bar')).toMatch(/flex-wrap:\s*wrap/)
     expect(rule(tablet, '.viz-deck-scrub')).toMatch(/flex:\s*1 1 100%/)
   })
+  it('phones on /mixtape show the page-index fan so the universe can be switched (home still hides it)', () => {
+    const phone = read('mixtape-universe.css').split('@media (max-width: 767px)')[1] ?? ''
+    expect(rule(phone, '.viz-page .page-index-fan')).toMatch(/display:\s*grid/)
+    expect(rule(phone, '.viz-page .page-index-fan')).toMatch(/grid-template-columns:\s*repeat\(2, auto\)/)
+    expect(rule(phone, '.viz-page .page-index-fan img')).toMatch(/width:\s*64px/)
+    const homePhone = read('page-index.css').split('@media (max-width: 767px)')[1] ?? ''
+    expect(homePhone).toMatch(/\.page-index-fan\s*\{\s*display:\s*none/)
+  })
+  it('MCU HUD title names Rajdhani at a loaded weight (the global h2 display font must not win)', () => {
+    const title = rule(read('faces/hud.css'), '.hud-title')
+    expect(title).toMatch(/font-family:\s*'Rajdhani'/)
+    expect(title).toMatch(/font-weight:\s*600/)
+  })
 })

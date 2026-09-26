@@ -64,4 +64,18 @@ describe('HudRing keyboard seeking', () => {
     fireEvent.change(range, { target: { value: '90' } })
     expect(c.seek).toHaveBeenCalledWith(90)
   })
+
+  it('a cancelled drag stops hover-seeking', () => {
+    const c = fakeControls()
+    render(<HudRing c={c} />)
+    const svg = document.querySelector('.hud-arc') as SVGSVGElement
+    svg.getBoundingClientRect = () => ({ left: 0, top: 0, width: 64, height: 64, right: 64, bottom: 64, x: 0, y: 0, toJSON: () => ({}) })
+    fireEvent.pointerDown(svg, { pointerId: 1, clientX: 64, clientY: 32 })
+    expect(c.seek).toHaveBeenCalledTimes(1)
+    fireEvent.pointerMove(svg, { pointerId: 1, clientX: 32, clientY: 64 })
+    expect(c.seek).toHaveBeenCalledTimes(2)
+    fireEvent.pointerCancel(svg, { pointerId: 1 })
+    fireEvent.pointerMove(svg, { pointerId: 1, clientX: 0, clientY: 32 })
+    expect(c.seek).toHaveBeenCalledTimes(2)
+  })
 })
