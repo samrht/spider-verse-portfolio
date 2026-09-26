@@ -1,22 +1,11 @@
 import * as THREE from 'three'
 import type { Universe } from '../../store/universeStore'
+import { VIZ_STYLES } from './vizStyles'
 
-// Mirrors --universe-primary / --universe-accent in styles/tokens.css plus
-// white for the third slot. Kept as constants (not read from CSS) so the
-// engine has no DOM dependency.
-const PRIMARY: Record<Universe, string> = {
-  '616': '#c0392b',
-  mcu: '#7fb7ff',
-  toon: '#ff3b3b',
-  verse: '#ff2d6b',
-}
-const ACCENT: Record<Universe, string> = {
-  '616': '#ffd400',
-  mcu: '#ff2d2d',
-  toon: '#ffe14d',
-  verse: '#00e5ff',
-}
-
+// Dot colours per universe, sourced from VIZ_STYLES so the table stays the
+// single source (spec §5). Kept as data, not read from CSS, so the engine has
+// no DOM dependency.
 export function paletteFor(u: Universe): [THREE.Color, THREE.Color, THREE.Color] {
-  return [new THREE.Color(PRIMARY[u]), new THREE.Color(ACCENT[u]), new THREE.Color('#ffffff')]
+  const [a, b, c] = VIZ_STYLES[u].palette
+  return [new THREE.Color(a), new THREE.Color(b), new THREE.Color(c)]
 }
