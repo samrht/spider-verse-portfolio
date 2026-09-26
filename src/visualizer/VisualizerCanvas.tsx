@@ -49,7 +49,11 @@ function Field({ signal, trackKey, debug }: VisualizerCanvasProps) {
   const slow = useRef({ over: 0, halved: false })
   const [, force] = useState(0)
 
-  useEffect(() => field.setPalette(universe), [field, universe])
+  const firstUniverse = useRef(true)
+  useEffect(() => {
+    field.setUniverse(universe, firstUniverse.current)
+    firstUniverse.current = false
+  }, [field, universe])
   useEffect(() => onReducedMotionChange((r) => field.setReducedMotion(r)), [field])
   // R14: only a real track change replays the emblem (the field keeps its
   // own monotonic clock, so no time argument is needed).

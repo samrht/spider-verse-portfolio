@@ -7,12 +7,14 @@ import { MorphMachine, type TargetName } from './morph'
 import { bakeTarget } from '../targets'
 import { paletteFor } from './palette'
 import { MonotonicClock } from './clock'
+import { VIZ_STYLES, DOT_STYLE_INDEX, type VizStyle } from './vizStyles'
 
 // Owns the Three objects for the field. No React, no DOM: VisualizerCanvas
 // mounts `points` and calls update() from useFrame. Attributes are baked
 // targets; per-frame work is six uniform writes.
 
 const SMOOTH = { attack: 0.5, release: 0.12 }
+const TWEEN_S = 0.4   // palette tween on a universe switch (spec §5)
 
 export class ParticleField {
   readonly points: THREE.Points
@@ -31,8 +33,12 @@ export class ParticleField {
     uPointScale: THREE.IUniform<number>
     uBreath: THREE.IUniform<number>
     uPalette: THREE.IUniform<THREE.Color[]>
+    uStyle: THREE.IUniform<number>
+    uInk: THREE.IUniform<THREE.Color>
+    uMotion: THREE.IUniform<number>
   }
   private reduced = false
+  private tween: { from: THREE.Color[]; to: THREE.Color[]; t: number; style: VizStyle; applied: boolean } | null = null
   private sm = { bass: 0, mids: 0, highs: 0 }
   // R13: the morph machine is clocked from accumulated frame dt, never from
   // playback position (which stays the BeatMap lookup key in useSignal).
@@ -53,6 +59,9 @@ export class ParticleField {
       uPointScale: { value: 6 },
       uBreath: { value: reducedMotion ? 0.125 : 0.25 },
       uPalette: { value: paletteFor('verse') },
+      uStyle: { value: DOT_STYLE_INDEX.glitch },
+      uInk: { value: new THREE.Color('#ffffff') },
+      uMotion: { value: reducedMotion ? 0 : 1 },
     }
     this.material = new THREE.ShaderMaterial({
       vertexShader: vert,
@@ -80,13 +89,50 @@ export class ParticleField {
     return g
   }
 
-  setPalette(u: Universe): void {
-    this.u.uPalette.value = paletteFor(u)
+  // Universe switch (spec §5): colours tween over TWEEN_S; dot style and blend
+  // mode flip at the midpoint. `instant` (first mount) and reduced motion skip
+  // the tween so a fresh page never flashes verse first.
+  setUniverse(u: Universe, instant = false): void {
+    const style = VIZ_STYLES[u]
+    const to = paletteFor(u)
+    if (instant || this.reduced) {
+      this.u.uPalette.value.forEach((c, i) => c.copy(to[i]))
+      this.applyStyle(style)
+      this.tween = null
+      return
+    }
+    this.tween = { from: this.u.uPalette.value.map((c) => c.clone()), to, t: 0, style, applied: false }
+  }
+
+  private applyStyle(s: VizStyle): void {
+    this.u.uStyle.value = DOT_STYLE_INDEX[s.dot]
+    this.u.uInk.value.set(s.ink)
+    this.material.blending = s.blend === 'normal' ? THREE.NormalBlending : THREE.AdditiveBlending
+    this.material.needsUpdate = true
+  }
+
+  private stepTween(dt: number): void {
+    const tw = this.tween
+    if (!tw) return
+    tw.t = Math.min(1, tw.t + dt / TWEEN_S)
+    this.u.uPalette.value.forEach((c, i) => c.lerpColors(tw.from[i], tw.to[i], tw.t))
+    if (!tw.applied && tw.t >= 0.5) { this.applyStyle(tw.style); tw.applied = true }
+    if (tw.t >= 1) this.tween = null
+  }
+
+  snapshot(): { style: number; blending: THREE.Blending; palette: string[]; tweening: boolean } {
+    return {
+      style: this.u.uStyle.value,
+      blending: this.material.blending,
+      palette: this.u.uPalette.value.map((c) => '#' + c.getHexString()),
+      tweening: this.tween !== null,
+    }
   }
 
   setReducedMotion(v: boolean): void {
     this.reduced = v
     this.u.uBreath.value = v ? 0.125 : 0.25
+    this.u.uMotion.value = v ? 0 : 1
   }
 
   onTrackStart(): void {
@@ -123,6 +169,7 @@ export class ParticleField {
     this.u.uHighs.value = this.sm.highs
     this.u.uBeat.value = this.reduced ? 0 : sig.beat
     this.u.uTime.value += dt
+    this.stepTween(dt)
   }
 
   // Frame-time guard from spec §7: rebuild at half N, once. Rebake the

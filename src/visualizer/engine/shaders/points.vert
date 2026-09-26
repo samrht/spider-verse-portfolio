@@ -13,6 +13,8 @@ uniform float uHighs;
 uniform float uTime;
 uniform float uPointScale;
 uniform float uBreath;   // 0.25 normal, 0.125 reduced motion
+uniform float uBeat;
+uniform int uStyle;      // see points.frag
 
 varying float vSeed;
 varying float vDepth;
@@ -68,10 +70,16 @@ void main() {
   float n = snoise(p * 2.0 + vec3(uTime * 0.4, aSeed * 3.0, 0.0));
   p += normalize(p + 0.0001) * n * uMids * 0.3;
   p *= 1.0 + uBass * uBreath;
+  // cel: dots bounce outward on the beat (uBeat is already 0 under reduced motion)
+  if (uStyle == 2) p *= 1.0 + uBeat * 0.12;
 
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   gl_Position = projectionMatrix * mv;
-  gl_PointSize = uPointScale * (1.2 + uHighs * 1.5 + aSeed * 0.6) / max(0.5, -mv.z);
+  float size = uPointScale * (1.2 + uHighs * 1.5 + aSeed * 0.6);
+  // ink: ±15 % size jitter by seed, swell on the beat; cel: fatter dots
+  if (uStyle == 0) size *= (0.85 + aSeed * 0.3) * (1.0 + uBeat * 0.35);
+  if (uStyle == 2) size *= 1.4;
+  gl_PointSize = size / max(0.5, -mv.z);
   vSeed = aSeed;
   vDepth = clamp((-mv.z - 2.0) / 5.0, 0.0, 1.0);
 }
