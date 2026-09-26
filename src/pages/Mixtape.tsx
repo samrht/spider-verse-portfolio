@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMixtapeStore } from '../store/mixtapeStore'
 import { useUniverseStore } from '../store/universeStore'
@@ -8,12 +8,14 @@ import { Deck } from '../visualizer/ui/Deck'
 import { ModeBadge } from '../visualizer/ui/ModeBadge'
 import { SpotifyChip } from '../visualizer/ui/SpotifyChip'
 import { useSpotifyStore } from '../visualizer/signal/spotifyPoll'
+import { useBeatVar } from '../visualizer/ui/useBeatVar'
+import { PageIndex } from '../comic/PageIndex'
 import '../styles/mixtape.css'
 import '../styles/visualizer.css'
+import '../styles/mixtape-universe.css'
 
 // /mixtape: the Halftone Field visualizer with the cassette deck over it.
-// Sets data-universe="earth-1610" on <html> for Miles' palette and restores
-// the previous universe on unmount.
+// Follows the active universe (spec §3.1); the page index switches it.
 export function Mixtape() {
   const spotifyStatus = useSpotifyStore((s) => s.status)
   const spotifySlug = useSpotifyStore((s) => s.slug)
@@ -29,19 +31,15 @@ export function Mixtape() {
   const [fallback, setFallback] = useState(false)
   const onFallback = useCallback(() => setFallback(true), [])
 
-  useEffect(() => {
-    // Keep the store's activeUniverse (which the halftone dots follow) in
-    // step with the page's forced earth-1610 palette, not just the DOM
-    // attribute — setUniverse updates both.
-    const prev = useUniverseStore.getState().activeUniverse
-    useUniverseStore.getState().setUniverse('verse')
-    return () => {
-      useUniverseStore.getState().setUniverse(prev)
-    }
-  }, [])
+  const universe = useUniverseStore((s) => s.activeUniverse)
+  const setUniverse = useUniverseStore((s) => s.setUniverse)
+  const pageRef = useRef<HTMLElement>(null)
+  useBeatVar(pageRef, signal)
+  const [noSplit, setNoSplit] = useState(false)
+  const onDegrade = useCallback(() => setNoSplit(true), [])
 
   return (
-    <main className={`viz-page ${deckHidden ? 'is-deck-hidden' : ''}`} data-universe="verse">
+    <main ref={pageRef} className={`viz-page ${deckHidden ? 'is-deck-hidden' : ''} ${noSplit ? 'no-split' : ''}`} data-universe={universe}>
       {fallback ? (
         <div className="viz-fallback" data-testid="viz-fallback" aria-hidden="true">
           <div className="mixtape-cover">
@@ -52,13 +50,15 @@ export function Mixtape() {
           </div>
         </div>
       ) : (
-        <VisualizerCanvas signal={signal} trackKey={trackKey} debug={debug} onFallback={onFallback} />
+        <VisualizerCanvas signal={signal} trackKey={trackKey} debug={debug} onFallback={onFallback} onDegrade={onDegrade} />
       )}
-      <Link to="/" className="mixtape-page-back viz-back">← BACK TO MOTHERSHIP</Link>
+      <Link to={`/#u-${universe}`} className="viz-back">← BACK<span className="viz-back-long"> TO THE COMIC</span></Link>
       <div className="viz-topright">
         <SpotifyChip />
         {!fallback && <ModeBadge kind={kind} />}
       </div>
+      <div className="viz-flash" aria-hidden="true" />
+      <PageIndex onSelect={setUniverse} />
       <Deck />
     </main>
   )

@@ -1,0 +1,43 @@
+/* /mixtape per universe (spec §5, §6): backdrops, chrome skins, beat flash. */
+.viz-page { background: #07070a; }
+.viz-page[data-universe='616'] { background: #f4e8c8 radial-gradient(circle, rgba(27, 27, 27, .14) .8px, transparent 1px) 0 0 / 6px 6px; }
+.viz-page[data-universe='mcu'] { background: radial-gradient(ellipse at 50% 55%, #0c1a2e 0%, #04070c 70%); }
+.viz-page[data-universe='mcu']::before {
+  content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(127, 183, 255, .05) 0 1px, transparent 1px 3px);
+}
+.viz-page[data-universe='toon'] { background: #ffe14d; }
+.viz-page[data-universe='verse'] { background: radial-gradient(ellipse at 50% 55%, #1a0a2a 0%, #07040c 70%); }
+
+/* Verse: red/cyan split on the dots (dropped by .no-split when frames stay slow) */
+.viz-page[data-universe='verse']:not(.no-split) .viz-canvas canvas {
+  filter: drop-shadow(2px 0 0 rgba(0, 229, 255, .8)) drop-shadow(-2px 0 0 rgba(255, 45, 107, .8));
+}
+/* Verse beat flash: a full-screen layer that only shows on strong beats */
+.viz-flash { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; }
+.viz-page[data-universe='verse'] .viz-flash {
+  background: linear-gradient(90deg, rgba(0, 229, 255, .35), rgba(255, 45, 107, .35));
+  mix-blend-mode: screen;
+  opacity: clamp(0, calc((var(--beat, 0) - .8) * 4), .6);
+}
+@media (prefers-reduced-motion: reduce) { .viz-page .viz-flash { display: none; } }
+
+/* Verse deck title: red/cyan split with a small chromatic flicker on the beat (spec §4.2) */
+.face-glitch .viz-deck-title { text-shadow: 2px 0 #00e5ff, -2px 0 #ff2d6b; }
+.face-glitch .viz-deck-title { transform: translateX(calc(max(var(--beat, 0) - .7, 0) * 6px)); }
+@media (prefers-reduced-motion: reduce) { .face-glitch .viz-deck-title { transform: none; } }
+
+/* Chrome follows the comic skins */
+.viz-back { color: var(--u-ink); font: 700 12px/1 var(--u-font-body); letter-spacing: .15em; text-decoration: none; border-bottom: 1px dashed currentColor; }
+.viz-page .viz-chip { background: var(--u-bg); color: var(--u-ink); border: 2px solid var(--u-accent); }
+.viz-page .viz-chip-track { color: var(--u-ink); }
+.viz-page .viz-badge { background: var(--u-caption-bg); color: var(--u-ink); border: 2px solid var(--u-ink); }
+
+/* Page index above the deck; drops to the reveal strip when the deck hides */
+.viz-page .page-index { bottom: calc(var(--deck-h, 72px) + 12px); z-index: 12; transition: bottom 300ms ease; }
+.viz-page.is-deck-hidden .page-index { bottom: 20px; }
+
+@media (max-width: 767px) {
+  .viz-back-long { display: none; }
+  .viz-topright { top: 44px; left: 12px; right: 12px; justify-content: flex-end; flex-wrap: wrap; }
+}

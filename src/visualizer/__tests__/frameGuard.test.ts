@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { nextOver } from '../frameGuard'
+import { nextOver, guardStep } from '../frameGuard'
 
 describe('nextOver', () => {
   it('resets on a stall (dt > 0.25s) instead of accumulating', () => {
@@ -19,5 +19,24 @@ describe('nextOver', () => {
     let over = 0
     for (let i = 0; i < 67; i++) over = nextOver(over, 0.03)
     expect(over).toBeGreaterThanOrEqual(2)
+  })
+})
+
+describe('guardStep', () => {
+  const slow = (g: { over: number; trips: number }, secs: number) => {
+    let s = g; let action: string | null = null
+    for (let t = 0; t < secs; t += 0.03) { const r = guardStep(s, 0.03); s = r.next; action = r.action ?? action }
+    return { s, action }
+  }
+  it('halves on the first sustained slowdown, degrades on the second, then stops', () => {
+    const a = slow({ over: 0, trips: 0 }, 2.1)
+    expect(a.action).toBe('halve')
+    const b = slow(a.s, 2.1)
+    expect(b.action).toBe('degrade')
+    const c = slow(b.s, 2.1)
+    expect(c.action).toBe(null)
+  })
+  it('a stall resets instead of counting', () => {
+    expect(guardStep({ over: 1.9, trips: 0 }, 3).next.over).toBe(0)
   })
 })

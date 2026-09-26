@@ -7,13 +7,14 @@ import { chooseDotCount } from './dotCount'
 import { useUniverseStore } from '../store/universeStore'
 import { prefersReducedMotion, onReducedMotionChange } from '../engine/motion'
 import { DebugOverlay } from './debug/DebugOverlay'
-import { nextOver } from './frameGuard'
+import { guardStep, type GuardState } from './frameGuard'
 
 export interface VisualizerCanvasProps {
   signal: AudioSignal          // mutated in place by the active provider
   trackKey: string             // changes → onTrackStart
   debug?: boolean
   onFallback?: () => void      // WebGL unavailable / shader failed
+  onDegrade?: () => void       // frames still slow after the halve (verse drops its CSS split)
 }
 
 // Synchronous probe: a real GL context check, no async work, safe under
@@ -32,7 +33,7 @@ function hasWebGL(): boolean {
   }
 }
 
-function Field({ signal, trackKey, debug }: VisualizerCanvasProps) {
+function Field({ signal, trackKey, debug, onDegrade }: VisualizerCanvasProps) {
   const gl = useThree((s) => s.gl)
   const n = useMemo(
     () =>
@@ -46,7 +47,7 @@ function Field({ signal, trackKey, debug }: VisualizerCanvasProps) {
   )
   const field = useMemo(() => new ParticleField(n, 1, prefersReducedMotion()), [n])
   const universe = useUniverseStore((s) => s.activeUniverse)
-  const slow = useRef({ over: 0, halved: false })
+  const guard = useRef<GuardState>({ over: 0, trips: 0 })
   const [, force] = useState(0)
 
   const firstUniverse = useRef(true)
@@ -62,17 +63,13 @@ function Field({ signal, trackKey, debug }: VisualizerCanvasProps) {
 
   useFrame((_, dt) => {
     field.update(signal, dt)
-    // spec §7: > 24 ms for 2 s → halve N once. A backgrounded tab can
+    // spec §7: > 24 ms for 2 s → halve N; a second 2 s → onDegrade. A backgrounded tab can
     // resume with a multi-second dt; frameGuard's nextOver treats that as
     // a stall and resets rather than accumulating.
-    if (!slow.current.halved) {
-      slow.current.over = nextOver(slow.current.over, dt)
-      if (slow.current.over >= 2) {
-        field.halve()
-        slow.current.halved = true
-        force((x) => x + 1)
-      }
-    }
+    const { next, action } = guardStep(guard.current, dt)
+    guard.current = next
+    if (action === 'halve') { field.halve(); force((x) => x + 1) }
+    if (action === 'degrade') onDegrade?.()
   })
 
   useEffect(() => {
