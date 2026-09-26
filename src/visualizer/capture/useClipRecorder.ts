@@ -43,7 +43,7 @@ export function useClipRecorder() {
   const [secondsLeft, setSecondsLeft] = useState(0)
   const stopRef = useRef<(() => void) | null>(null)
 
-  const start = useCallback(() => {
+  const start = useCallback((opts: { withAudio?: boolean } = {}) => {
     if (!supported || stopRef.current) return
     const fmt = pickMimeType((t) => MediaRecorder.isTypeSupported(t))
     const canvas = document.createElement('canvas')
@@ -54,7 +54,7 @@ export function useClipRecorder() {
 
     const startMeta = currentMeta()
     const video = canvas.captureStream(CLIP_FPS)
-    const tap = audioTap(getMediaElement())
+    const tap = opts.withAudio === false ? null : audioTap(getMediaElement())
     const stream = new MediaStream([...video.getVideoTracks(), ...(tap ? tap.stream.getAudioTracks() : [])])
     const rec = new MediaRecorder(stream, { mimeType: fmt.mime, videoBitsPerSecond: 6_000_000 })
     const chunks: Blob[] = []

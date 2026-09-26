@@ -56,3 +56,10 @@
 }
 .viz-clip-count { font-size: 12px; text-shadow: 0 0 2px #000; }
 .viz-page:fullscreen { width: 100vw; height: 100vh; }
+
+.viz-mic-wrap { position: relative; display: inline-flex; }
+.viz-mic.is-on { background: var(--u-accent); color: var(--u-bg); }
+.viz-mic-note {
+  position: absolute; top: calc(100% + 6px); right: 0; white-space: nowrap; padding: 4px 6px;
+  background: #ff2d2d; color: #fff; font: 700 10px/1 var(--u-font-body); letter-spacing: .12em;
+}

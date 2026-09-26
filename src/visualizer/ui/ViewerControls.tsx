@@ -25,3 +25,14 @@ export function ClipButton({ recording, secondsLeft, onStart, onStop }: { record
     </button>
   )
 }
+
+export function MicButton({ state, onToggle }: { state: 'off' | 'starting' | 'on' | 'blocked'; onToggle: () => void }) {
+  const on = state === 'on' || state === 'starting'
+  return (
+    <span className="viz-mic-wrap">
+      <button type="button" className={`viz-ctl viz-mic ${on ? 'is-on' : ''}`} onClick={onToggle}
+        aria-label={on ? 'Turn off room mic (M)' : 'Turn on room mic (M)'} aria-pressed={on} data-spider-sense>🎤</button>
+      {state === 'blocked' && <span className="viz-mic-note" role="status">MIC BLOCKED</span>}
+    </span>
+  )
+}

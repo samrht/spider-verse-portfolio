@@ -12,7 +12,8 @@ import { useBeatVar } from '../visualizer/ui/useBeatVar'
 import { PageIndex } from '../comic/PageIndex'
 import { useFullscreen } from '../visualizer/ui/useFullscreen'
 import { useClipRecorder } from '../visualizer/capture/useClipRecorder'
-import { FullscreenButton, ClipButton } from '../visualizer/ui/ViewerControls'
+import { FullscreenButton, ClipButton, MicButton } from '../visualizer/ui/ViewerControls'
+import { useMicMode } from '../visualizer/ui/useMicMode'
 import '../styles/mixtape.css'
 import '../styles/visualizer.css'
 import '../styles/mixtape-universe.css'
@@ -28,7 +29,8 @@ export function Mixtape() {
     () => ({ playing: spotifyStatus === 'playing', slug: spotifySlug, position: () => positionMs() / 1000 }),
     [spotifyStatus, spotifySlug, positionMs],
   )
-  const { signal, trackKey, kind } = useSignal({ spotify })
+  const mic = useMicMode()
+  const { signal, trackKey, kind } = useSignal({ spotify, mic: { on: mic.on, onResult: mic.report } })
   const deckHidden = useMixtapeStore((s) => s.deckHidden)
   const debug = new URLSearchParams(window.location.search).has('debug')
   const [fallback, setFallback] = useState(false)
@@ -44,9 +46,10 @@ export function Mixtape() {
   const clip = useClipRecorder()
   const clipOn = clip.supported && !fallback
 
-  // F toggles fullscreen, C starts/stops a clip (ignored while typing or with modifiers).
-  const keys = useRef({ fs, clip, clipOn })
-  useEffect(() => { keys.current = { fs, clip, clipOn } })
+  // F toggles fullscreen, C starts/stops a clip (silent while the room mic listens),
+  // M toggles the room mic (all ignored while typing or with modifiers).
+  const keys = useRef({ fs, clip, clipOn, mic, kind })
+  useEffect(() => { keys.current = { fs, clip, clipOn, mic, kind } })
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null
@@ -54,7 +57,8 @@ export function Mixtape() {
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return
       const k = keys.current
       if ((e.key === 'f' || e.key === 'F') && k.fs.supported) void k.fs.toggle()
-      if ((e.key === 'c' || e.key === 'C') && k.clipOn) { if (k.clip.recording) k.clip.stop(); else k.clip.start() }
+      if ((e.key === 'c' || e.key === 'C') && k.clipOn) { if (k.clip.recording) k.clip.stop(); else k.clip.start({ withAudio: k.kind !== 'mic' }) }
+      if ((e.key === 'm' || e.key === 'M') && k.mic.supported) k.mic.toggle()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -78,7 +82,8 @@ export function Mixtape() {
       <div className="viz-topright">
         <SpotifyChip />
         {!fallback && <ModeBadge kind={kind} />}
-        {clipOn && <ClipButton recording={clip.recording} secondsLeft={clip.secondsLeft} onStart={clip.start} onStop={clip.stop} />}
+        {mic.supported && !fallback && <MicButton state={mic.state} onToggle={mic.toggle} />}
+        {clipOn && <ClipButton recording={clip.recording} secondsLeft={clip.secondsLeft} onStart={() => clip.start({ withAudio: kind !== 'mic' })} onStop={clip.stop} />}
         {fs.supported && <FullscreenButton active={fs.active} onToggle={() => void fs.toggle()} />}
       </div>
       <div className="viz-flash" aria-hidden="true" />

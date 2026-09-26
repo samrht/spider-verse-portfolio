@@ -96,4 +96,11 @@ describe('useClipRecorder', () => {
     expect(lastRecorder()).toBe(first)
     act(() => result.current.stop())
   })
+
+  it('start({ withAudio: false }) records video only', () => {
+    const { result } = renderHook(() => useClipRecorder())
+    act(() => result.current.start({ withAudio: false }))
+    expect(result.current.recording).toBe(true)
+    act(() => result.current.stop())
+  })
 })

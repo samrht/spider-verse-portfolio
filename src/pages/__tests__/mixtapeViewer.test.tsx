@@ -3,6 +3,10 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { useUniverseStore } from '../../store/universeStore'
 
+// jsdom has no WebGL, so the real canvas would flip the page to its static
+// fallback (which hides the mic button). A no-op canvas keeps the live view.
+vi.mock('../../visualizer/VisualizerCanvas', () => ({ VisualizerCanvas: () => null }))
+
 beforeEach(() => {
   vi.spyOn(globalThis, 'fetch').mockImplementation(() => Promise.resolve(new Response(JSON.stringify({ error: 'unavailable' }))))
   useUniverseStore.setState({ activeUniverse: '616' })
@@ -39,5 +43,18 @@ describe('/mixtape viewer controls', () => {
     render(<MemoryRouter><Mixtape /></MemoryRouter>)
     fireEvent.keyDown(screen.getByLabelText('Volume'), { key: 'f' })
     expect(request).not.toHaveBeenCalled()
+  })
+
+  it('shows the mic button when getUserMedia exists, and M toggles it', () => {
+    // A running context + a getUserMedia that never settles keeps the mic in 'starting'
+    // (deterministic: no async failure flips it to blocked mid-assertion).
+    vi.stubGlobal('AudioContext', class { state = 'running'; resume() { return Promise.resolve() } })
+    Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia: vi.fn(() => new Promise(() => {})) } })
+    render(<MemoryRouter><Mixtape /></MemoryRouter>)
+    const btn = screen.getByLabelText('Turn on room mic (M)')
+    expect(btn).toBeInTheDocument()
+    fireEvent.keyDown(window, { key: 'm' })
+    expect(screen.getByLabelText(/room mic/i).getAttribute('aria-pressed')).toBe('true')
+    delete (navigator as unknown as Record<string, unknown>).mediaDevices
   })
 })
