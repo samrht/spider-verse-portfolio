@@ -5,7 +5,7 @@ describe('paletteFor', () => {
   it('returns three colours with the universe primary first', () => {
     const p = paletteFor('616')
     expect(p).toHaveLength(3)
-    expect(p[0].getHexString()).toBe('c0392b')
-    expect(paletteFor('mcu')[0].getHexString()).toBe('7fb7ff')
+    expect(p[0].getHexString()).toBe('e53222')
+    expect(paletteFor('mcu')[0].getHexString()).toBe('ff3b3b')
   })
 })

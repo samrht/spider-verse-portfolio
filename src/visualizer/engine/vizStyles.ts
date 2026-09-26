@@ -20,8 +20,8 @@ export interface VizStyle {
 export const DOT_STYLE_INDEX: Record<DotStyle, number> = { ink: 0, holo: 1, cel: 2, glitch: 3 }
 
 export const VIZ_STYLES: Record<Universe, VizStyle> = {
-  '616': { blend: 'normal', palette: ['#c0392b', '#1f4e9c', '#1b1b1b'], ink: '#1b1b1b', dot: 'ink', beatFx: 'swell', lightBackdrop: true },
-  mcu: { blend: 'additive', palette: ['#7fb7ff', '#ff2d2d', '#e6f1ff'], ink: '#7fb7ff', dot: 'holo', beatFx: 'pulse', lightBackdrop: false },
+  '616': { blend: 'normal', palette: ['#e53222', '#2f6fe0', '#f2a007'], ink: '#1b1b1b', dot: 'ink', beatFx: 'swell', lightBackdrop: true },
+  mcu: { blend: 'additive', palette: ['#ff3b3b', '#ffc53d', '#6fd3ff'], ink: '#7fb7ff', dot: 'holo', beatFx: 'pulse', lightBackdrop: false },
   toon: { blend: 'normal', palette: ['#ff3b3b', '#1f6feb', '#101010'], ink: '#101010', dot: 'cel', beatFx: 'bounce', lightBackdrop: true },
   verse: { blend: 'additive', palette: ['#ff2d6b', '#00e5ff', '#ffffff'], ink: '#ffffff', dot: 'glitch', beatFx: 'split', lightBackdrop: false },
 }

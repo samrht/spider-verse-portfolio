@@ -78,7 +78,7 @@ Every face stacks into two rows (object + title / scrubber + transport). MCU rin
 |---|---|---|---|---|
 | Backdrop (CSS, `.viz-page[data-universe]`) | cream paper + faint halftone texture | navy radial glow + scanline overlay | flat `#ffe14d` | today's dark purple radial |
 | `blend` | normal | additive | normal | additive |
-| `palette` | `#c0392b`, `#1f4e9c`, `#1b1b1b` | `#7fb7ff`, `#ff2d2d`, `#e6f1ff` | `#ff3b3b`, `#1f6feb`, `#101010` | `#ff2d6b`, `#00e5ff`, `#ffffff` |
+| `palette` | `#e53222`, `#2f6fe0`, `#f2a007` | `#ff3b3b`, `#ffc53d`, `#6fd3ff` | `#ff3b3b`, `#1f6feb`, `#101010` | `#ff2d6b`, `#00e5ff`, `#ffffff` |
 | `ink` (outline) | `#1b1b1b` | — | `#101010` | — |
 | `dot` | hard disc, ±15 % size jitter by seed | soft radial falloff, per-dot flicker (`uTime`, seed) | 1.4× disc with an ink outline ring | hard disc |
 | `beatFx` | swell (size) | pulse (brightness) | bounce (radial offset) | split + flash |

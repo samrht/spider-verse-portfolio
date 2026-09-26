@@ -11,7 +11,7 @@ describe('ParticleField.setUniverse', () => {
     f.setUniverse('616', true)
     const s = f.snapshot()
     expect(s.tweening).toBe(false)
-    expect(s.palette[0]).toBe('#c0392b')
+    expect(s.palette[0]).toBe('#e53222')
     expect(s.style).toBe(0)
     expect(s.blending).toBe(THREE.NormalBlending)
   })
@@ -37,7 +37,7 @@ describe('ParticleField.setUniverse', () => {
     f.setUniverse('mcu', true)
     f.setUniverse('616')
     expect(f.snapshot().tweening).toBe(false)
-    expect(f.snapshot().palette[0]).toBe('#c0392b')
+    expect(f.snapshot().palette[0]).toBe('#e53222')
   })
 
   it('a second switch mid-tween retargets from the current blend', () => {
@@ -47,7 +47,7 @@ describe('ParticleField.setUniverse', () => {
     f.update(sig(), 0.2)
     f.setUniverse('mcu')
     f.update(sig(), 1)
-    expect(f.snapshot().palette[0]).toBe('#7fb7ff')
+    expect(f.snapshot().palette[0]).toBe('#ff3b3b')
     expect(f.snapshot().style).toBe(1)
   })
 })
