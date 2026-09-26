@@ -87,4 +87,52 @@ describe('ParticleField.setPaletteOverride', () => {
     expect(s.palette).toEqual(['#112233', '#445566', '#778899'])
     expect(s.style).toBe(1)
   })
+
+  it('carries the universe style over when override interrupts mid-tween', () => {
+    const f = new ParticleField(200)
+    f.setUniverse('verse', true)
+    f.setUniverse('616')
+    f.update(sig(), 0.1)  // 25%: style not yet applied
+    f.setPaletteOverride(['#112233', '#445566', '#778899'])
+    f.update(sig(), 1)
+    const s = f.snapshot()
+    expect(s.palette).toEqual(['#112233', '#445566', '#778899'])
+    expect(s.style).toBe(0)  // 616's style
+    expect(s.blending).toBe(THREE.NormalBlending)
+  })
+
+  it('applies style immediately when override and universe switch in the same tick', () => {
+    const f = new ParticleField(200)
+    f.setUniverse('verse', true)
+    f.setUniverse('mcu')
+    f.setPaletteOverride(['#112233', '#445566', '#778899'])
+    f.update(sig(), 1)
+    const s = f.snapshot()
+    expect(s.palette).toEqual(['#112233', '#445566', '#778899'])
+    expect(s.style).toBe(1)  // holo
+    expect(s.blending).toBe(THREE.AdditiveBlending)
+  })
+
+  it('no-op when setting the same palette twice', () => {
+    const f = new ParticleField(200)
+    f.setUniverse('verse', true)
+    const colors: [string, string, string] = ['#112233', '#445566', '#778899']
+    f.setPaletteOverride(colors)
+    f.update(sig(), 0.2)
+    expect(f.snapshot().tweening).toBe(true)
+    f.setPaletteOverride(colors)  // same palette
+    f.update(sig(), 0.25)  // if restarted, would only be 62.5% done; without restart, is near 100%
+    const s2 = f.snapshot()
+    expect(s2.palette).toEqual(colors)
+    expect(s2.tweening).toBe(false)
+  })
+
+  it('no-op when calling with null after universe with no tween', () => {
+    const f = new ParticleField(200)
+    f.setUniverse('616', true)
+    const universe = f.snapshot().palette
+    f.setPaletteOverride(null)  // no override, universe has no tween
+    expect(f.snapshot().tweening).toBe(false)
+    expect(f.snapshot().palette).toEqual(universe)
+  })
 })

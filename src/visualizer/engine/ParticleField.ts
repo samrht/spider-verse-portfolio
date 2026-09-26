@@ -110,14 +110,22 @@ export class ParticleField {
   // Album-art colours (listen-modes spec §4.2): tween the palette only; the
   // universe's dot style and blend stay. null tweens back to the universe.
   setPaletteOverride(colors: [string, string, string] | null): void {
+    // No-op if nothing changes
+    if (this.override && colors) {
+      if (this.override.every((c, i) => '#' + c.getHexString() === colors[i])) return
+    } else if (!this.override && !colors) return
+
     this.override = colors ? colors.map((c) => new THREE.Color(c)) : null
     const to = this.override ? this.override.map((c) => c.clone()) : paletteFor(this.universe)
+    const pending = this.tween && !this.tween.applied ? this.tween.style : null
+
     if (this.reduced) {
       this.u.uPalette.value.forEach((c, i) => c.copy(to[i]))
+      if (pending) this.applyStyle(pending)
       this.tween = null
       return
     }
-    this.tween = { from: this.u.uPalette.value.map((c) => c.clone()), to, t: 0, style: null, applied: true }
+    this.tween = { from: this.u.uPalette.value.map((c) => c.clone()), to, t: 0, style: pending, applied: pending === null }
   }
 
   private applyStyle(s: VizStyle): void {
