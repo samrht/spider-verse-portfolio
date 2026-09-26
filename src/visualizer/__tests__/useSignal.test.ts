@@ -153,6 +153,50 @@ describe('useSignal', () => {
     expect(result.current.nowSeconds()).toBeCloseTo(12.25)
   })
 
+  it('mic on selects the mic provider and reports success', async () => {
+    const started = vi.fn(async () => {})
+    const mic: SignalProvider = { mode: 'live', start: started, stop: vi.fn(), sample: (o: AudioSignal) => { o.mode = 'live' } }
+    const onResult = vi.fn()
+    const { result } = renderHook(() => useSignal({ mic: { on: true, onResult }, makeMic: () => mic }))
+    expect(result.current.kind).toBe('mic')
+    await waitFor(() => expect(onResult).toHaveBeenCalledWith(true))
+    expect(started).toHaveBeenCalled()
+  })
+
+  it('a mic that fails to start reports false and falls back to procedural', async () => {
+    const mic: SignalProvider = { mode: 'live', start: vi.fn(async () => { throw new Error('denied') }), stop: vi.fn(), sample: vi.fn() }
+    const onResult = vi.fn()
+    const { result } = renderHook(() => useSignal({ mic: { on: true, onResult }, makeMic: () => mic }))
+    await waitFor(() => expect(onResult).toHaveBeenCalledWith(false))
+    await waitFor(() => expect(result.current.signal.mode).toBe('procedural'))
+  })
+
+  // R3: a provider still waiting in start() (mic permission prompt) must be
+  // stopped when the effect tears down, not only one that already went live.
+  it.each([
+    ['unmount', (h: { unmount: () => void; rerender: (p: { on: boolean }) => void }) => h.unmount()],
+    ['mic toggled off', (h: { unmount: () => void; rerender: (p: { on: boolean }) => void }) => h.rerender({ on: false })],
+  ])('stops a mic whose start() is still pending on %s', async (_label, teardown) => {
+    let resolveStart: () => void = () => {}
+    const mic: SignalProvider = {
+      mode: 'live',
+      start: vi.fn(() => new Promise<void>((r) => { resolveStart = r })),
+      stop: vi.fn(),
+      sample: vi.fn(),
+    }
+    const onResult = vi.fn()
+    const h = renderHook(
+      ({ on }: { on: boolean }) => useSignal({ beatMapFor: () => false, mic: { on, onResult }, makeMic: () => mic }),
+      { initialProps: { on: true } },
+    )
+    await waitFor(() => expect(mic.start).toHaveBeenCalled())
+    expect(mic.stop).not.toHaveBeenCalled()
+    act(() => teardown(h))
+    expect(mic.stop).toHaveBeenCalled()
+    await act(async () => { resolveStart() })
+    expect(mic.sample).not.toHaveBeenCalled()
+  })
+
   it('interpolatePosition holds the stamped position while paused and never goes negative', () => {
     expect(interpolatePosition(10, 1000, 2500, false)).toBe(10)
     expect(interpolatePosition(10, 1000, 2500, true)).toBeCloseTo(11.5)

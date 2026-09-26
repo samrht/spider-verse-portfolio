@@ -1,6 +1,7 @@
 import type { ProviderKind } from '../signal/select'
 
 const LABEL: Record<ProviderKind, string> = {
+  mic: 'ROOM MIC',
   live: 'LIVE FFT',
   beatmap: 'SYNCED',
   procedural: 'PROCEDURAL',

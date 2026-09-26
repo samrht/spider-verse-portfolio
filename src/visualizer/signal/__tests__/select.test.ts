@@ -25,3 +25,15 @@ describe('selectProvider', () => {
     expect(selectProvider({ ...base, localPlaying: true, spotifyPlaying: true, spotifyHasBeatMap: true })).toBe('live')
   })
 })
+
+describe('selectProvider mic', () => {
+  const base = { localPlaying: true, analyserAvailable: true, localHasBeatMap: true, spotifyPlaying: true, spotifyHasBeatMap: true }
+  it('mic wins over everything when on', () => {
+    expect(selectProvider({ ...base, micOn: true })).toBe('mic')
+    expect(selectProvider({ localPlaying: false, analyserAvailable: false, localHasBeatMap: false, spotifyPlaying: false, spotifyHasBeatMap: false, micOn: true })).toBe('mic')
+  })
+  it('off or absent changes nothing', () => {
+    expect(selectProvider({ ...base, micOn: false })).toBe('live')
+    expect(selectProvider(base)).toBe('live')
+  })
+})

@@ -5,6 +5,7 @@ import { MIXTAPE_TRACKS } from '../data/mixtape'
 import { createSignal, type SignalProvider } from './signal/types'
 import { Procedural } from './signal/Procedural'
 import { LiveFFT } from './signal/LiveFFT'
+import { MicFFT } from './signal/MicFFT'
 import { selectProvider, type ProviderKind } from './signal/select'
 import { hasBeatMap, loadBeatMap, BeatMap } from './signal/BeatMap'
 
@@ -16,6 +17,9 @@ export interface SignalInputs {
   beatMapFor?: (slug: string) => boolean
   makeBeatMap?: (slug: string, position: () => number) => SignalProvider | null
   spotify?: { playing: boolean; slug: string | null; position: () => number } | null
+  // Mic mode: `on` selects the mic; `onResult` reports whether it started.
+  mic?: { on: boolean; onResult?: (ok: boolean) => void } | null
+  makeMic?: () => SignalProvider
 }
 
 // R13: the store's `progress` only changes on the 250 ms poll. While playing,
@@ -44,7 +48,12 @@ export function useSignal(inputs: SignalInputs = {}) {
   const beatMapFor = inputs.beatMapFor ?? hasBeatMap
   const makeBeatMap = inputs.makeBeatMap ?? null
   const spotify = inputs.spotify ?? null
+  const micOn = !!inputs.mic?.on
+  const makeMic = inputs.makeMic ?? null
+  const onMicResult = useRef(inputs.mic?.onResult)
+  useEffect(() => { onMicResult.current = inputs.mic?.onResult })
   const kind: ProviderKind = selectProvider({
+    micOn,
     localPlaying: isPlaying,
     analyserAvailable: LiveFFT.available() && getMediaElement() !== null,
     localHasBeatMap: beatMapFor(slug),
@@ -74,6 +83,9 @@ export function useSignal(inputs: SignalInputs = {}) {
   useEffect(() => {
     let cancelled = false
     let active: SignalProvider | null = null
+    // R3: the provider whose start() is in flight (e.g. MicFFT awaiting the
+    // permission prompt), so teardown can stop it before it goes live.
+    let pending: SignalProvider | null = null
     // Synced-from-Spotify only when nothing plays locally; otherwise the
     // local deck's track, whatever the provider tier.
     const trackSlug = kind === 'beatmap' && !isPlaying ? spotify?.slug ?? slug : slug
@@ -89,6 +101,7 @@ export function useSignal(inputs: SignalInputs = {}) {
     }
 
     async function pick(): Promise<SignalProvider> {
+      if (kind === 'mic') return makeMic ? makeMic() : new MicFFT()
       if (kind === 'live') {
         const el = getMediaElement()
         if (el) return new LiveFFT(el)
@@ -117,11 +130,13 @@ export function useSignal(inputs: SignalInputs = {}) {
       let failed = false
       try {
         p = await pick()
+        pending = p
         await p.start()
       } catch {
         failed = true
         p = await pickFallback()
       }
+      if (kind === 'mic') onMicResult.current?.(!failed)
       if (cancelled) { p.stop(); return }
       active = p
       setProvider(p)
@@ -130,7 +145,7 @@ export function useSignal(inputs: SignalInputs = {}) {
 
     void run()
 
-    return () => { cancelled = true; active?.stop() }
+    return () => { cancelled = true; active?.stop(); if (pending && pending !== active) pending.stop() }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- nowSeconds/makeBeatMap/beatMapFor change only alongside kind/isPlaying/spotify?.slug here
   }, [kind, slug, isPlaying, spotify?.slug, retry])
 
