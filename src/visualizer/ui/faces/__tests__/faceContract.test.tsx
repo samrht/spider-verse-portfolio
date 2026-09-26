@@ -3,11 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { fakeControls } from './fakeControls'
 import { GlitchCassette } from '../GlitchCassette'
 import { InkedCassette } from '../InkedCassette'
+import { HudRing } from '../HudRing'
 import type { Face } from '../index'
 
 const ALL: Array<[string, Face]> = [
   ['glitch-cassette', GlitchCassette],
   ['inked-cassette', InkedCassette],
+  ['hud-ring', HudRing],
 ]
 
 describe.each(ALL)('%s face contract', (id, FaceC) => {
@@ -47,5 +49,17 @@ describe.each(ALL)('%s face contract', (id, FaceC) => {
     expect(c.toggleHidden).toHaveBeenCalled()
     expect(c.seek).toHaveBeenCalledWith(60)
     expect(c.setVolume).toHaveBeenCalledWith(0.2)
+  })
+})
+
+describe('HudRing keyboard seeking', () => {
+  it('keeps a focusable Track progress range even though the arc is the visible control', () => {
+    const c = fakeControls()
+    render(<HudRing c={c} />)
+    const range = screen.getByLabelText('Track progress')
+    expect(range.tagName).toBe('INPUT')
+    expect(range).not.toHaveAttribute('tabindex', '-1')
+    fireEvent.change(range, { target: { value: '90' } })
+    expect(c.seek).toHaveBeenCalledWith(90)
   })
 })
