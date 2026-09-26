@@ -62,4 +62,61 @@ describe('MicFFT', () => {
     await expect(p.start()).rejects.toThrow(/not running/)
     expect(f.getUserMedia).not.toHaveBeenCalled()
   })
+
+  it('wiring throws after permission → start rejects AND track.stop was called', async () => {
+    const f = fakes()
+    const thrownError = new Error('createMediaStreamSource failed')
+    const createMediaStreamSource = vi.fn(() => { throw thrownError })
+    f.ctx.createMediaStreamSource = createMediaStreamSource
+    const p = new MicFFT({ ctxFactory: () => f.ctx, getUserMedia: f.getUserMedia })
+    await expect(p.start()).rejects.toBe(thrownError)
+    expect(f.track.stop).toHaveBeenCalled()
+  })
+
+  it('stop() while getUserMedia is pending → start rejects, track.stop called, createMediaStreamSource NOT called', async () => {
+    let resolveMedia: (stream: MediaStream) => void
+    const mediaPromise = new Promise<MediaStream>((resolve) => { resolveMedia = resolve })
+    const track = { stop: vi.fn() }
+    const stream = { getTracks: () => [track] } as unknown as MediaStream
+    const analyser = { fftSize: 0, smoothingTimeConstant: 0, frequencyBinCount: 512, connect: vi.fn(), getByteFrequencyData: (a: Uint8Array) => a.fill(0) }
+    const source = { connect: vi.fn(), disconnect: vi.fn() }
+    const ctx = {
+      sampleRate: 44100, state: 'running' as AudioContextState, destination: { dest: true },
+      resume: vi.fn(async () => {}),
+      createAnalyser: () => analyser,
+      createMediaStreamSource: vi.fn(() => source),
+    }
+    const getUserMedia = vi.fn(() => mediaPromise)
+    const p = new MicFFT({ ctxFactory: () => ctx as unknown as AudioContext, getUserMedia })
+    const startPromise = p.start()
+    p.stop()
+    resolveMedia!(stream)
+    await expect(startPromise).rejects.toThrow()
+    expect(track.stop).toHaveBeenCalled()
+    expect(ctx.createMediaStreamSource).not.toHaveBeenCalled()
+  })
+
+  it('two concurrent start() calls → getUserMedia called once, both resolve', async () => {
+    const f = fakes()
+    const p = new MicFFT({ ctxFactory: () => f.ctx, getUserMedia: f.getUserMedia })
+    const [r1, r2] = await Promise.all([p.start(), p.start()])
+    expect(r1).toBeUndefined()
+    expect(r2).toBeUndefined()
+    expect(f.getUserMedia).toHaveBeenCalledTimes(1)
+  })
+
+  it('sequential start(); start() → getUserMedia called once', async () => {
+    const f = fakes()
+    const p = new MicFFT({ ctxFactory: () => f.ctx, getUserMedia: f.getUserMedia })
+    await p.start()
+    await p.start()
+    expect(f.getUserMedia).toHaveBeenCalledTimes(1)
+  })
+
+  it('smoothingTimeConstant is 0.6 after start', async () => {
+    const f = fakes()
+    const p = new MicFFT({ ctxFactory: () => f.ctx, getUserMedia: f.getUserMedia })
+    await p.start()
+    expect(f.analyser.smoothingTimeConstant).toBe(0.6)
+  })
 })

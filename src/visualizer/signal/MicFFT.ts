@@ -17,6 +17,8 @@ export class MicFFT implements SignalProvider {
   private stream: MediaStream | null = null
   private source: MediaStreamAudioSourceNode | null = null
   private analyser: AnalyserNode | null = null
+  private gen = 0
+  private starting: Promise<void> | null = null
 
   // No parameter properties: tsconfig has erasableSyntaxOnly.
   constructor(opts: { ctxFactory?: () => AudioContext; getUserMedia?: (c: MediaStreamConstraints) => Promise<MediaStream> } = {}) {
@@ -28,24 +30,43 @@ export class MicFFT implements SignalProvider {
     return typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && LiveFFT.available()
   }
 
-  async start(): Promise<void> {
-    if (this.analyser) return
+  start(): Promise<void> {
+    if (this.analyser) return Promise.resolve()
+    if (this.starting) return this.starting
+    const gen = this.gen
+    this.starting = this.open(gen).finally(() => { this.starting = null })
+    return this.starting
+  }
+
+  private async open(gen: number): Promise<void> {
     const ctx = this.ctxFactory()
     await ctx.resume().catch(() => {})
     if (ctx.state !== 'running') throw new Error('AudioContext not running')
     const stream = await this.getMedia(MIC_CONSTRAINTS)
-    const source = ctx.createMediaStreamSource(stream)
-    const analyser = ctx.createAnalyser()
-    analyser.fftSize = 1024
-    analyser.smoothingTimeConstant = 0.6
-    source.connect(analyser)
-    this.stream = stream
-    this.source = source
-    this.analyser = analyser
-    this.core.attach(analyser, ctx.sampleRate)
+    const release = () => stream.getTracks().forEach((t) => t.stop())
+    // stop() was called while we waited for permission: don't go live.
+    if (gen !== this.gen) { release(); throw new Error('MicFFT stopped before start completed') }
+    try {
+      const source = ctx.createMediaStreamSource(stream)
+      const analyser = ctx.createAnalyser()
+      analyser.fftSize = 1024
+      analyser.smoothingTimeConstant = 0.6
+      source.connect(analyser)
+      this.stream = stream
+      this.source = source
+      this.analyser = analyser
+      this.core.attach(analyser, ctx.sampleRate)
+    } catch (e) {
+      release()
+      this.stream = null
+      this.source = null
+      this.analyser = null
+      throw e
+    }
   }
 
   stop(): void {
+    this.gen++
     this.source?.disconnect()
     this.stream?.getTracks().forEach((t) => t.stop())
     this.stream = null
