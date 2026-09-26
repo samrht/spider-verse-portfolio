@@ -7,6 +7,7 @@ import { chooseDotCount } from './dotCount'
 import { useUniverseStore } from '../store/universeStore'
 import { prefersReducedMotion, onReducedMotionChange } from '../engine/motion'
 import { DebugOverlay } from './debug/DebugOverlay'
+import type { FrameSink } from './capture/useClipRecorder'
 import { guardStep, type GuardState } from './frameGuard'
 
 export interface VisualizerCanvasProps {
@@ -15,6 +16,7 @@ export interface VisualizerCanvasProps {
   debug?: boolean
   onFallback?: () => void      // WebGL unavailable / shader failed
   onDegrade?: () => void       // frames still slow after the halve (verse drops its CSS split)
+  capture?: FrameSink | null   // clip recording: receives each rendered frame
 }
 
 // Synchronous probe: a real GL context check, no async work, safe under
@@ -33,7 +35,7 @@ function hasWebGL(): boolean {
   }
 }
 
-function Field({ signal, trackKey, debug, onDegrade }: VisualizerCanvasProps) {
+function Field({ signal, trackKey, debug, onDegrade, capture }: VisualizerCanvasProps) {
   const gl = useThree((s) => s.gl)
   const n = useMemo(
     () =>
@@ -84,8 +86,21 @@ function Field({ signal, trackKey, debug, onDegrade }: VisualizerCanvasProps) {
     <>
       <primitive object={field.points} />
       {debug && <DebugOverlay field={field} signal={signal} />}
+      {capture && <CaptureTap sink={capture} />}
     </>
   )
+}
+
+// Mounted only while a clip records. A priority-1 useFrame takes over R3F's
+// render for that frame, so the WebGL drawing buffer is copied into the clip
+// canvas in the same tick it was drawn (without preserveDrawingBuffer the
+// buffer is cleared once the browser presents it).
+function CaptureTap({ sink }: { sink: FrameSink }) {
+  useFrame(({ gl, scene, camera }) => {
+    gl.render(scene, camera)
+    sink.draw(gl.domElement)
+  }, 1)
+  return null
 }
 
 interface ErrorBoundaryProps {

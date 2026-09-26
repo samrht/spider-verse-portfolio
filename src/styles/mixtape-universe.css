@@ -44,3 +44,15 @@
   .viz-page .page-index-fan { display: grid; grid-template-columns: repeat(2, auto); }
   .viz-page .page-index-fan img { width: 64px; height: 40px; }
 }
+
+/* Viewer controls (fullscreen, 10-second clip), skinned like the chip/badge */
+.viz-ctl {
+  width: 30px; height: 30px; display: grid; place-items: center; padding: 0; cursor: pointer;
+  background: var(--u-bg); color: var(--u-ink); border: 2px solid var(--u-accent); font: 700 14px/1 var(--u-font-body);
+}
+.viz-clip.is-recording {
+  color: #fff; border-color: #ff2d2d;
+  background: conic-gradient(#ff2d2d calc(var(--clip-p, 0) * 360deg), rgba(255, 45, 45, .25) 0);
+}
+.viz-clip-count { font-size: 12px; text-shadow: 0 0 2px #000; }
+.viz-page:fullscreen { width: 100vw; height: 100vh; }

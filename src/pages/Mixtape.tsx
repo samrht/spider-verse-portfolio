@@ -10,6 +10,9 @@ import { SpotifyChip } from '../visualizer/ui/SpotifyChip'
 import { useSpotifyStore } from '../visualizer/signal/spotifyPoll'
 import { useBeatVar } from '../visualizer/ui/useBeatVar'
 import { PageIndex } from '../comic/PageIndex'
+import { useFullscreen } from '../visualizer/ui/useFullscreen'
+import { useClipRecorder } from '../visualizer/capture/useClipRecorder'
+import { FullscreenButton, ClipButton } from '../visualizer/ui/ViewerControls'
 import '../styles/mixtape.css'
 import '../styles/visualizer.css'
 import '../styles/mixtape-universe.css'
@@ -37,6 +40,25 @@ export function Mixtape() {
   useBeatVar(pageRef, signal)
   const [noSplit, setNoSplit] = useState(false)
   const onDegrade = useCallback(() => setNoSplit(true), [])
+  const fs = useFullscreen(pageRef)
+  const clip = useClipRecorder()
+  const clipOn = clip.supported && !fallback
+
+  // F toggles fullscreen, C starts/stops a clip (ignored while typing or with modifiers).
+  const keys = useRef({ fs, clip, clipOn })
+  useEffect(() => { keys.current = { fs, clip, clipOn } })
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return
+      const k = keys.current
+      if ((e.key === 'f' || e.key === 'F') && k.fs.supported) void k.fs.toggle()
+      if ((e.key === 'c' || e.key === 'C') && k.clipOn) { if (k.clip.recording) k.clip.stop(); else k.clip.start() }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   return (
     <main ref={pageRef} className={`viz-page ${deckHidden ? 'is-deck-hidden' : ''} ${noSplit ? 'no-split' : ''}`} data-universe={universe}>
@@ -50,12 +72,14 @@ export function Mixtape() {
           </div>
         </div>
       ) : (
-        <VisualizerCanvas signal={signal} trackKey={trackKey} debug={debug} onFallback={onFallback} onDegrade={onDegrade} />
+        <VisualizerCanvas signal={signal} trackKey={trackKey} debug={debug} onFallback={onFallback} onDegrade={onDegrade} capture={clip.sink} />
       )}
       <Link to={`/#u-${universe}`} className="viz-back">← BACK<span className="viz-back-long"> TO THE COMIC</span></Link>
       <div className="viz-topright">
         <SpotifyChip />
         {!fallback && <ModeBadge kind={kind} />}
+        {clipOn && <ClipButton recording={clip.recording} secondsLeft={clip.secondsLeft} onStart={clip.start} onStop={clip.stop} />}
+        {fs.supported && <FullscreenButton active={fs.active} onToggle={() => void fs.toggle()} />}
       </div>
       <div className="viz-flash" aria-hidden="true" />
       <PageIndex onSelect={setUniverse} />

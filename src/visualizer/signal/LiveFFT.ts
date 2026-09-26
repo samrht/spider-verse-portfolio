@@ -23,6 +23,25 @@ function defaultCtx(): AudioContext {
   return sharedCtx
 }
 
+// Clip recording (capture/useClipRecorder): tap the element's cached source
+// into a MediaStream so a recording carries the same audio the analyser
+// hears. Same R16 rule as start(): never create a source unless the shared
+// context is running, or the element would be muted page-wide.
+export function audioTap(el: HTMLMediaElement | null): { stream: MediaStream; release: () => void } | null {
+  const ctx = sharedCtx
+  if (!el || !ctx || ctx.state !== 'running') return null
+  let source = sources.get(el)
+  if (!source) {
+    source = ctx.createMediaElementSource(el)
+    source.connect(ctx.destination)
+    sources.set(el, source)
+  }
+  const dest = ctx.createMediaStreamDestination()
+  source.connect(dest)
+  const tapped = source
+  return { stream: dest.stream, release: () => tapped.disconnect(dest) }
+}
+
 export class LiveFFT implements SignalProvider {
   readonly mode = 'live' as const
   private source: MediaElementAudioSourceNode | null = null
