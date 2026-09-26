@@ -33,8 +33,9 @@
 .viz-page .viz-chip-track { color: var(--u-ink); }
 .viz-page .viz-badge { background: var(--u-caption-bg); color: var(--u-ink); border: 2px solid var(--u-ink); }
 
-/* Page index above the deck; drops to the reveal strip when the deck hides */
-.viz-page .page-index { bottom: calc(var(--deck-h, 72px) + 12px); z-index: 12; transition: bottom 300ms ease; }
+/* Page index above the deck; drops to the reveal strip when the deck hides.
+ * /mixtape has no Bugle rail, so zero --bugle-w to keep the index bottom-left. */
+.viz-page .page-index { --bugle-w: 0px; bottom: calc(var(--deck-h, 72px) + 12px); z-index: 12; transition: bottom 300ms ease; }
 .viz-page.is-deck-hidden .page-index { bottom: 20px; }
 
 @media (max-width: 767px) {
