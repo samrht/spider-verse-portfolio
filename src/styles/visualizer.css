@@ -120,3 +120,6 @@
   background: transparent;
 }
 .viz-fallback .mixtape-cover { width: min(48vw, 320px); }
+
+.viz-chip-swatches { display: flex; flex-direction: column; gap: 2px; flex: none; }
+.viz-chip-swatches i { display: block; width: 8px; height: 8px; border: 1px solid rgba(0, 0, 0, .4); }

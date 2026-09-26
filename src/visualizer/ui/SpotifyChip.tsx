@@ -5,7 +5,7 @@ import { useMixtapeStore } from '../../store/mixtapeStore'
 // Top-right chip: the owner's Spotify now-playing (public feed). Offers
 // "▶ listen along" when the track is one of the mixtape songs.
 
-export function SpotifyChip() {
+export function SpotifyChip({ swatches = null }: { swatches?: [string, string, string] | null } = {}) {
   const status = useSpotifyStore((s) => s.status)
   const now = useSpotifyStore((s) => s.now)
   const slug = useSpotifyStore((s) => s.slug)
@@ -38,6 +38,11 @@ export function SpotifyChip() {
   return (
     <div className={`viz-chip ${status === 'playing' ? 'is-playing' : 'is-idle'}`}>
       {now.art && <img className="viz-chip-art" src={now.art} alt="" width={28} height={28} />}
+      {swatches && (
+        <span className="viz-chip-swatches" aria-hidden="true">
+          {swatches.map((c) => <i key={c} style={{ background: c }} />)}
+        </span>
+      )}
       <div className="viz-chip-text">
         <span className="viz-chip-label">{status === 'playing' ? '● SMARTH IS LISTENING' : 'LAST PLAYED'}</span>
         <span className="viz-chip-track">{now.track}</span>

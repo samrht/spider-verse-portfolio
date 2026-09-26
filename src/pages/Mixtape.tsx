@@ -14,6 +14,7 @@ import { useFullscreen } from '../visualizer/ui/useFullscreen'
 import { useClipRecorder } from '../visualizer/capture/useClipRecorder'
 import { FullscreenButton, ClipButton, MicButton } from '../visualizer/ui/ViewerControls'
 import { useMicMode } from '../visualizer/ui/useMicMode'
+import { useArtPalette } from '../visualizer/ui/useArtPalette'
 import '../styles/mixtape.css'
 import '../styles/visualizer.css'
 import '../styles/mixtape-universe.css'
@@ -31,6 +32,7 @@ export function Mixtape() {
   )
   const mic = useMicMode()
   const { signal, trackKey, kind } = useSignal({ spotify, mic: { on: mic.on, onResult: mic.report } })
+  const artColors = useArtPalette({ micOn: mic.on })
   const deckHidden = useMixtapeStore((s) => s.deckHidden)
   const debug = new URLSearchParams(window.location.search).has('debug')
   const [fallback, setFallback] = useState(false)
@@ -76,11 +78,11 @@ export function Mixtape() {
           </div>
         </div>
       ) : (
-        <VisualizerCanvas signal={signal} trackKey={trackKey} debug={debug} onFallback={onFallback} onDegrade={onDegrade} capture={clip.sink} />
+        <VisualizerCanvas signal={signal} trackKey={trackKey} debug={debug} onFallback={onFallback} onDegrade={onDegrade} capture={clip.sink} paletteOverride={artColors} />
       )}
       <Link to={`/#u-${universe}`} className="viz-back">← BACK<span className="viz-back-long"> TO THE COMIC</span></Link>
       <div className="viz-topright">
-        <SpotifyChip />
+        <SpotifyChip swatches={artColors} />
         {!fallback && <ModeBadge kind={kind} />}
         {mic.supported && !fallback && <MicButton state={mic.state} onToggle={mic.toggle} />}
         {clipOn && <ClipButton recording={clip.recording} secondsLeft={clip.secondsLeft} onStart={() => clip.start({ withAudio: kind !== 'mic' })} onStop={clip.stop} />}
