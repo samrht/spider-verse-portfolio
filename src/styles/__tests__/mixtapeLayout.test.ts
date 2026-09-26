@@ -13,4 +13,10 @@ describe('/mixtape layout CSS', () => {
   it('page index ignores the Bugle rail offset (no rail on /mixtape, spec §6 bottom-left)', () => {
     expect(rule(read('mixtape-universe.css'), '.viz-page .page-index')).toMatch(/--bugle-w:\s*0(px)?\s*;/)
   })
+  it('boombox transport stays on one row on desktop (no width cap that wraps the hide button)', () => {
+    const css = read('faces/boombox.css')
+    const desktop = rule(css.split('@media')[0], '.boom-transport')
+    expect(desktop).not.toMatch(/max-width/)
+    expect(desktop).not.toMatch(/flex-wrap:\s*wrap/)
+  })
 })
